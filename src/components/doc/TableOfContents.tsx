@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './TableOfContents.module.css';
 
 interface TocItem {
@@ -10,6 +11,8 @@ interface TocItem {
 export function TableOfContents() {
     const [headings, setHeadings] = useState<TocItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
+
+    const location = useLocation();
 
     // Parse headings from DOM
     useEffect(() => {
@@ -25,10 +28,12 @@ export function TableOfContents() {
             setHeadings(items);
         };
 
-        // Run after render
+        // Run immediately and after a short delay to catch layout shifts/loading
+        updateHeadings();
         const timeout = setTimeout(updateHeadings, 100);
+        const timeout2 = setTimeout(updateHeadings, 500); // Retry for lazy loaded content
 
-        // Observer for dynamic content changes?
+        // Observer for dynamic content changes
         const observer = new MutationObserver(updateHeadings);
         const main = document.querySelector('main');
         if (main) {
@@ -37,9 +42,10 @@ export function TableOfContents() {
 
         return () => {
             clearTimeout(timeout);
+            clearTimeout(timeout2);
             observer.disconnect();
         };
-    }, []);
+    }, [location.pathname]);
 
     // Scroll spy
     useEffect(() => {
