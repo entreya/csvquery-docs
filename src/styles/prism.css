@@ -103,8 +103,9 @@ pre[class*="language-"] {
 
 .token.regex,
 .token.important,
-.token.variable {
-    color: #d16969;
+.token.variable,
+.token.parameter {
+    color: #E5C07B;
 }
 
 .token.important,

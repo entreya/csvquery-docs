@@ -113,13 +113,14 @@
 /* Operators, URLs */
 .code :global(.token.operator),
 .code :global(.token.entity),
-.code :global(.token.url),
-.code :global(.token.variable) {
+.code :global(.token.url) {
     color: var(--token-operator);
 }
 
 /* Regex */
 .code :global(.token.regex),
-.code :global(.token.important) {
+.code :global(.token.important),
+.code :global(.token.variable),
+.code :global(.token.parameter) {
     color: var(--token-variable);
 }
