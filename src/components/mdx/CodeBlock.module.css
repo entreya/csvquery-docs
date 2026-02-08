@@ -51,6 +51,21 @@
     margin: 0;
     padding: var(--space-4);
     overflow-x: auto;
+    /* Hide scrollbar track for code blocks to avoid empty line */
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+.pre::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.pre::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pre::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 .code {
@@ -85,7 +100,9 @@
 .code :global(.token.atrule),
 .code :global(.token.attr-value),
 .code :global(.token.php),
-.code :global(.token.delimiter) {
+.code :global(.token.delimiter),
+.code :global(.token.package),
+.code :global(.token.namespace) {
     color: var(--token-keyword);
 }
 
