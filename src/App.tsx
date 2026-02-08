@@ -14,9 +14,9 @@ const QuickStartPage = lazy(() => import('./pages/QuickStartPage').then(module =
 const ExamplesPage = lazy(() => import('./pages/ExamplesPage').then(module => ({ default: module.ExamplesPage })));
 const RequirementsPage = lazy(() => import('./pages/RequirementsPage').then(module => ({ default: module.RequirementsPage })));
 const ApiPage = lazy(() => import('./pages/ApiPage').then(module => ({ default: module.ApiPage })));
-const CsvQueryPage = lazy(() => import('./pages/CsvQueryPage').then(module => ({ default: module.CsvQueryPage })));
-const ActiveQueryPage = lazy(() => import('./pages/ActiveQueryPage').then(module => ({ default: module.ActiveQueryPage })));
 const ConditionsPage = lazy(() => import('./pages/ConditionsPage').then(module => ({ default: module.ConditionsPage })));
+const ApiDocPage = lazy(() => import('./pages/ApiDocPage').then(module => ({ default: module.ApiDocPage })));
+
 const ArchitecturePage = lazy(() => import('./pages/ArchitecturePage').then(module => ({ default: module.ArchitecturePage })));
 const PhpLayerPage = lazy(() => import('./pages/PhpLayerPage').then(module => ({ default: module.PhpLayerPage })));
 const GoEnginePage = lazy(() => import('./pages/GoEnginePage').then(module => ({ default: module.GoEnginePage })));
@@ -59,10 +59,9 @@ function App() {
 
                 {/* API Reference */}
                 <Route path="api" element={<ApiPage />} />
-                <Route path="api/csvquery" element={<CsvQueryPage />} />
-                <Route path="api/activequery" element={<ActiveQueryPage />} />
                 <Route path="api/conditions" element={<ConditionsPage />} />
-                {/* Removed Internal Reference route */}
+                {/* Dynamic API Docs - Matches /api/php/csvquery etc */}
+                <Route path="api/*" element={<ApiDocPage />} />
 
                 {/* Architecture */}
                 <Route path="architecture" element={<ArchitecturePage />} />

@@ -1,0 +1,57 @@
+---
+title: Cell
+description: Represents a single cell with validation and type casting.
+---
+
+# Cell
+
+`Entreya\CsvQuery\Models\Cell`
+
+The `Cell` class represents a single data point. It provides methods for type casting and validation.
+
+## Methods
+
+### getValue()
+
+```php
+public function getValue(): mixed
+```
+
+Returns the raw value.
+
+### isEmpty()
+
+```php
+public function isEmpty(): bool
+```
+
+Checks if the cell is null or empty string.
+
+### Type Casting
+
+```php
+public function asString(): string
+public function asInt(int $default = 0): int
+public function asFloat(float $default = 0.0): float
+public function asBool(): bool
+```
+
+Converts the cell value to the specified type. `asBool` handles "true", "1", "yes", "on", "y".
+
+### validate()
+
+```php
+public function validate(array $rules): array
+```
+
+Validates the cell value against a set of rules.
+
+**Supported Rules:**
+- `required`
+- `numeric`
+- `email`
+- `min:N`
+- `max:N`
+
+**Returns:**
+- `['valid' => bool, 'errors' => array]`

@@ -26,18 +26,38 @@ const normalize = (path: string) => {
     return p || '/';
 };
 
-// Helper to find title from navigation
+// Helper to find hierarchical title from navigation
+// Returns "Parent > Child" string
 const findTitle = (path: string): string => {
     const normPath = normalize(path);
-    for (const section of navigation) {
-        for (const item of section.items) {
-            if (normalize(item.href) === normPath) {
-                return item.title;
+
+    // Recursive search to find path to item
+    const search = (items: typeof navigation[0]['items'], currentPath: string[]): string[] | null => {
+        for (const item of items) {
+            // Check if this item matches
+            if (item.href && normalize(item.href) === normPath) {
+                return [...currentPath, item.title];
+            }
+            // Check children
+            if (item.items) {
+                const found = search(item.items, [...currentPath, item.title]);
+                if (found) return found;
             }
         }
+        return null;
+    };
+
+    for (const section of navigation) {
+        // We can optionally include section title, but usually it's too high level (e.g. "API Reference")
+        const found = search(section.items, []);
+        if (found) {
+            return found.join(' > ');
+        }
     }
+
     // Fallback for known paths
     if (normPath === '/' || normPath === '') return 'Introduction';
+
     // Fallback to capitalizing last segment
     const segments = normPath.split('/');
     const last = segments[segments.length - 1];
@@ -53,21 +73,30 @@ export function TabsProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const path = normalize(location.pathname);
         setTabs((prev) => {
-            // Check if tab exists
-            if (prev.some(t => normalize(t.path) === path)) {
+            // Update title if tab exists (in case hierarchy changed/navigation loaded)
+            const existingIndex = prev.findIndex(t => normalize(t.path) === path);
+            const title = findTitle(path);
+
+            if (existingIndex !== -1) {
+                // If title is different, update it
+                if (prev[existingIndex].title !== title) {
+                    const newTabs = [...prev];
+                    newTabs[existingIndex] = { ...newTabs[existingIndex], title };
+                    return newTabs;
+                }
                 return prev;
             }
+
             // Add new tab
-            const title = findTitle(path);
             return [...prev, { path: location.pathname, title }];
         });
     }, [location.pathname]);
 
-    // Added title to callback but ignoring it for now to silence unused var
+    // Active tab path should effectively just be current location
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const openTab = useCallback((path: string, _title?: string) => {
         navigate(path);
-        // The useEffect will handle adding the tab
     }, [navigate]);
 
     const closeTab = useCallback((path: string) => {

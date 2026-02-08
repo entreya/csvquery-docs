@@ -1,0 +1,50 @@
+---
+title: Row
+description: Represents a single record in the result set.
+---
+
+# Row
+
+`Entreya\CsvQuery\Models\Row`
+
+The `Row` class represents a single record in a CsvQuery result set. It provides array-like access and methods to retrieve column data.
+
+## Constructor
+
+```php
+public function __construct($csvQuery, array $data, $lineNumber = null)
+```
+
+## Methods
+
+### getColumn()
+
+```php
+public function getColumn($name): ?Column
+```
+
+Retrieves a `Column` object for the specified field name or index.
+
+### getCell()
+
+```php
+public function getCell($name): ?Cell
+```
+
+Retrieves a `Cell` object for the specified field.
+
+### toAssociativeArray()
+
+```php
+public function toAssociativeArray(): array
+```
+
+Returns the raw data as an associative array.
+
+### getLineNumber()
+
+```php
+public function getLineNumber(): ?int
+```
+
+Returns the original line number in the CSV file (if available).

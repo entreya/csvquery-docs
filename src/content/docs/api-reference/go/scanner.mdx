@@ -1,0 +1,44 @@
+---
+title: Scanner
+description: SIMD-accelerated CSV parser.
+---
+
+# Scanner
+
+`github.com/entreya/csvquery/internal/indexer`
+
+The `Scanner` provides high-performance CSV parsing using Memory Mapping (mmap) and SIMD instructions. It is designed to saturate disk I/O and utilize all CPU cores.
+
+## Features
+
+-   **Memory Mapping**: Maps the entire CSV file into virtual memory for zero-copy access.
+-   **SIMD Acceleration**: Uses SIMD instructions (AVX2/NEON) to detect delimiters and quotes 8x faster than standard byte-by-byte scanning.
+-   **Parallelism**: Splits the file into chunks and processes them concurrently.
+
+## Methods
+
+### NewScanner
+
+```go
+func NewScanner(filePath, separator string) (*Scanner, error)
+```
+
+Creates a new scanner instance.
+
+### Scan
+
+```go
+func (scanner *Scanner) Scan(indexDefs [][]int, handler func(workerID int, keys [][]byte, offset, line int64)) error
+```
+
+Iterates over the CSV file.
+-   **indexDefs**: Specifies which columns to extract for each index.
+-   **handler**: Callback function invoked for each row.
+
+### GetStats
+
+```go
+func (scanner *Scanner) GetStats() (rowsScanned int64, bytesRead int64, elapsed time.Duration)
+```
+
+Returns real-time scanning statistics.

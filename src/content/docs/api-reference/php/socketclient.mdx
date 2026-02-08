@@ -1,0 +1,56 @@
+---
+title: SocketClient
+description: Persistent Unix socket client for the Go daemon.
+---
+
+# SocketClient
+
+`Entreya\CsvQuery\Bridge\SocketClient`
+
+The `SocketClient` provides a high-performance, persistent connection to the CsvQuery Go daemon via Unix Domain Sockets. It automatically handles daemon startup and connection management.
+
+## Methods
+
+### getInstance()
+
+```php
+public static function getInstance(string $binaryPath = '', string $indexDir = ''): self
+```
+
+Returns the singleton instance of the client.
+
+### query()
+
+```php
+public function query(string $action, array $params = []): array
+```
+
+Sends a raw query request to the daemon.
+
+**Parameters:**
+- `action` (string): Action to perform (`count`, `select`, `groupby`, `ping`, `status`).
+- `params` (array): Parameters for the action.
+
+### count()
+
+```php
+public function count(string $csvPath, array $where = []): int
+```
+
+Sends a fast count request to the daemon.
+
+### select()
+
+```php
+public function select(string $csvPath, array $where = [], int $limit = 0, int $offset = 0): array
+```
+
+Sends a select request to the daemon.
+
+### ping()
+
+```php
+public function ping(): bool
+```
+
+Checks if the daemon is responsive.

@@ -1,6 +1,6 @@
 export interface NavItem {
     title: string;
-    href: string;
+    href?: string;
     items?: NavItem[];
 }
 
@@ -29,10 +29,35 @@ export const navigation: NavSection[] = [
         title: 'API Reference',
         items: [
             { title: 'Overview', href: '/api' },
-            { title: 'CsvQuery Class', href: '/api/csvquery' },
-            { title: 'ActiveQuery Class', href: '/api/activequery' },
+            {
+                title: 'PHP SDK',
+                items: [
+                    { title: 'CsvQuery', href: '/api/php/csvquery' },
+                    { title: 'ActiveQuery', href: '/api/php/activequery' },
+                    { title: 'Command', href: '/api/php/command' },
+                    { title: 'GoBridge', href: '/api/php/gobridge' },
+                    { title: 'SocketClient', href: '/api/php/socketclient' },
+                    {
+                        title: 'Models',
+                        items: [
+                            { title: 'Row', href: '/api/php/models-row' },
+                            { title: 'Column', href: '/api/php/models-column' },
+                            { title: 'Cell', href: '/api/php/models-cell' },
+                        ]
+                    }
+                ]
+            },
+            {
+                title: 'Go Engine',
+                items: [
+                    { title: 'CLI Commands', href: '/api/go/cli' },
+                    { title: 'Query Engine', href: '/api/go/query-engine' },
+                    { title: 'Indexer', href: '/api/go/indexer' },
+                    { title: 'Scanner', href: '/api/go/scanner' },
+                    { title: 'Daemon', href: '/api/go/daemon' },
+                ]
+            },
             { title: 'Condition Syntax', href: '/api/conditions' },
-            // Removed Internal Reference
         ],
     },
     {
@@ -60,3 +85,24 @@ export const mainNavItems = [
     { title: 'Architecture', href: '/architecture' },
     { title: 'Benchmarks', href: '/benchmarks' },
 ];
+
+export function getFlattenedNavItems(): { title: string, href: string }[] {
+    const flat: { title: string, href: string }[] = [];
+
+    function recurse(items: NavItem[]) {
+        for (const item of items) {
+            if (item.href) {
+                flat.push({ title: item.title, href: item.href });
+            }
+            if (item.items) {
+                recurse(item.items);
+            }
+        }
+    }
+
+    for (const section of navigation) {
+        recurse(section.items);
+    }
+
+    return flat;
+}

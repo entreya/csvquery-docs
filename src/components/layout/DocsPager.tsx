@@ -1,13 +1,18 @@
 import { Link, useLocation } from 'react-router-dom';
-import { navigation } from '../../lib/navigation';
+import { getFlattenedNavItems } from '../../lib/navigation';
 import styles from './DocsPager.module.css';
 
 export function DocsPager() {
     const location = useLocation();
 
     // Flatten navigation to find next/prev
-    const flatNav = navigation.flatMap(section => section.items);
-    const currentIndex = flatNav.findIndex(item => item.href === location.pathname);
+    const flatNav = getFlattenedNavItems();
+    // Normalize location path to match hrefs (strip trailing slash if any)
+    const currentPath = location.pathname.endsWith('/') && location.pathname.length > 1
+        ? location.pathname.slice(0, -1)
+        : location.pathname;
+
+    const currentIndex = flatNav.findIndex(item => item.href === currentPath);
 
     if (currentIndex === -1) return null;
 

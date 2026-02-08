@@ -13,22 +13,37 @@ export function Breadcrumbs() {
 
     // Helper to find title for a segment/path
     const findTitle = (path: string) => {
-        // Try to find in navigation
-        for (const section of navigation) {
-            for (const item of section.items) {
-                if (item.href.endsWith(path)) return item.title;
+        // Broad search in navigation
+        let foundTitle: string | undefined;
+
+        const search = (items: typeof navigation[0]['items']) => {
+            for (const item of items) {
+                if (item.href === path) {
+                    foundTitle = item.title;
+                    return;
+                }
+                if (item.items) {
+                    search(item.items);
+                    if (foundTitle) return;
+                }
             }
-            if (section.title.toLowerCase().replace(/\s+/g, '-') === path) return section.title;
-            // Also check if segment matches section title loosely
+        };
+
+        for (const section of navigation) {
+            if (section.items) search(section.items);
+            if (foundTitle) return foundTitle;
         }
+
         // Fallback: capitalize
-        return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, ' ');
+        const segments = path.split('/');
+        const last = segments[segments.length - 1];
+        return last ? last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, ' ') : 'Page';
     };
 
-    const crumbs = pathSegments.map((segment, index) => {
+    const crumbs = pathSegments.map((_, index) => {
         const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
         const isLast = index === pathSegments.length - 1;
-        const title = findTitle(segment);
+        const title = findTitle(path);
 
         return (
             <li key={path} className={styles.item}>

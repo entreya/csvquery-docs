@@ -1,0 +1,38 @@
+.pageWrapper {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-4);
+    gap: var(--space-8);
+}
+
+.contentArea {
+    flex: 1;
+    min-width: 0;
+    /* Prevent overflow */
+}
+
+.markdown {
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    line-height: 1.7;
+}
+
+/* Right Sidebar (TOC) */
+.rightSidebar {
+    display: none;
+    width: 250px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 1280px) {
+    .rightSidebar {
+        display: block;
+    }
+}
+
+/* Ensure prism code blocks look good */
+.markdown pre {
+    margin: var(--space-6) 0;
+    box-shadow: var(--shadow-sm);
+}

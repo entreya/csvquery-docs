@@ -1,0 +1,138 @@
+---
+title: ActiveQuery
+description: Fluent interface for building and executing queries.
+---
+
+# ActiveQuery
+
+`Entreya\CsvQuery\Query\ActiveQuery`
+
+The `ActiveQuery` class provides a fluent interface for building and executing queries on CSV files, mimicking the `yii\db\ActiveQuery` pattern.
+
+## Constructor
+
+```php
+public function __construct(CsvQuery $csvQuery)
+```
+
+**Parameters:**
+- `csvQuery` (CsvQuery): Parent instance.
+
+## Query Building Methods
+
+### select()
+
+```php
+public function select(array $columns): self
+```
+
+Specifies the columns to be selected.
+
+### where()
+
+```php
+public function where(array|string|null $condition, mixed $value = null): self
+```
+
+Sets the WHERE condition for the query.
+
+**Formats:**
+- Hash: `['status' => 1, 'type' => 'A']`
+- Operator: `['>', 'price', 100]`
+- String: `'id = 5'` (Simulated)
+
+### andWhere() / orWhere()
+
+```php
+public function andWhere(array|string $condition): self
+public function orWhere(array|string $condition): self
+```
+
+Adds additional conditions using AND / OR logic.
+
+### orderBy()
+
+```php
+public function orderBy(array|string $columns): self
+```
+
+Specifies the order of results (e.g., `['id' => SORT_DESC]`).
+
+### limit() / offset()
+
+```php
+public function limit(int $limit): self
+public function offset(int $offset): self
+```
+
+Sets the pagination parameters.
+
+### indexBy()
+
+```php
+public function indexBy(string|callable $column): self
+```
+
+Indexes the result array by a specific column or callable.
+
+### asArray()
+
+```php
+public function asArray(bool $value = true): self
+```
+
+If true, returns results as associative arrays instead of `Row` objects.
+
+## Execution Methods
+
+### all()
+
+```php
+public function all(): array
+```
+
+Executes the query and returns all matching records.
+
+**Returns:**
+- `array`: Array of `Row` objects or arrays.
+
+### one()
+
+```php
+public function one(): array|Row|null
+```
+
+Executes the query and returns the first matching record.
+
+### count()
+
+```php
+public function count(): int
+```
+
+Returns the number of matching records. Optimized to use indexes or Go engine when possible.
+
+### exists()
+
+```php
+public function exists(): bool
+```
+
+Checks if at least one row matches the query.
+
+### batch() / each()
+
+```php
+public function batch(int $batchSize = 100): \Generator
+public function each(int $batchSize = 100): \Generator
+```
+
+Iterates over results efficiently using generators to minimize memory usage.
+
+### explain()
+
+```php
+public function explain(string $format = 'array'): mixed
+```
+
+Returns the execution plan (e.g., IndexScan vs FullScan) for the query.

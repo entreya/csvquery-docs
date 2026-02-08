@@ -21,13 +21,30 @@ export function SearchModal({ onClose }: SearchModalProps) {
     const navigate = useNavigate();
 
     // Build searchable items from navigation
-    const searchItems: SearchResult[] = useMemo(() => navigation.flatMap(section =>
-        section.items.map(item => ({
-            title: item.title,
-            href: item.href,
-            section: section.title,
-        }))
-    ), []);
+    const searchItems: SearchResult[] = useMemo(() => {
+        const items: SearchResult[] = [];
+
+        function recurse(navItems: import('../../lib/navigation').NavItem[], sectionName: string) {
+            for (const item of navItems) {
+                if (item.href) {
+                    items.push({
+                        title: item.title,
+                        href: item.href,
+                        section: sectionName,
+                    });
+                }
+                if (item.items) {
+                    recurse(item.items, sectionName);
+                }
+            }
+        }
+
+        navigation.forEach(section => {
+            recurse(section.items, section.title);
+        });
+
+        return items;
+    }, []);
 
     // Filter results based on query
     useEffect(() => {
@@ -57,11 +74,6 @@ export function SearchModal({ onClose }: SearchModalProps) {
         });
         return groups;
     }, [results]);
-
-    // Flatten filtered results for keyboard navigation index
-    // We need to know which absolute index corresponds to which item in the grouped view
-    // But honestly, for simple navigation, we can just keep 'results' flat list for index state
-    // and map the index to the click handler.
 
     // Handle keyboard navigation
     const handleKeyDown = useCallback(

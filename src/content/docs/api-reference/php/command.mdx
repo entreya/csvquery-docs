@@ -1,0 +1,32 @@
+---
+title: Command
+description: Low-level command builder for SQL debugging.
+---
+
+# Command
+
+`Entreya\CsvQuery\Query\Command`
+
+The `Command` class mimics the Yii2 Command pattern and is primarily used for generating SQL-like debug strings from query configurations.
+
+## Constructor
+
+```php
+public function __construct(array $config)
+```
+
+**Parameters:**
+- `config` (array): Configuration array mapping properties (`tableName`, `select`, `where`, etc.).
+
+## Methods
+
+### getQuery()
+
+```php
+public function getQuery(): string
+```
+
+Generates a SQL-like string representation of the current query configuration. This is useful for debugging purposes to see how the query builder has interpreted the fluent rules.
+
+**Returns:**
+- `string`: The generated SQL string.

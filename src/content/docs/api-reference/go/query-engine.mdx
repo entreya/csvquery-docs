@@ -1,0 +1,53 @@
+---
+title: Query Engine
+description: Internal Go engine for executing queries against disk indexes.
+---
+
+# Query Engine
+
+`github.com/entreya/csvquery/internal/query`
+
+The `QueryEngine` is responsible for planning and executing queries. It selects the best available index, performs B-Tree lookups, and retrieves data from the CSV file using memory mapping.
+
+## QueryConfig
+
+The configuration struct for `NewQueryEngine`.
+
+```go
+type QueryConfig struct {
+    CsvPath      string     // Path to CSV file
+    IndexDir     string     // Directory containing .didx files
+    Where        *Condition // Root of the filter tree
+    Limit        int        // Max results
+    Offset       int        // Skip N results
+    CountOnly    bool       // Return only count
+    Explain      bool       // Return execution plan
+    GroupBy      string     // Column to group by
+    AggCol       string     // Column to aggregate
+    AggFunc      string     // Aggregation function (count, sum, avg, min, max)
+}
+```
+
+## Methods
+
+### NewQueryEngine
+
+```go
+func NewQueryEngine(config QueryConfig) *QueryEngine
+```
+
+Creates a new instance of the query engine.
+
+### Run
+
+```go
+func (q *QueryEngine) Run() error
+```
+
+Executes the query pipeline:
+1.  **Planning**: Determines the best execution strategy (IndexScan vs FullScan).
+2.  **Execution**: Scans the selected index (if any).
+3.  **Fetching**: Retrieves raw CSV data using memory mapping.
+4.  **Filtering**: Applies post-filters for conditions not covered by the index.
+5.  **Aggregation**: Performs grouping and aggregation if requested.
+6.  **Output**: Writes results to the configured `Writer` (default: stdout).

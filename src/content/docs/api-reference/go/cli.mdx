@@ -1,0 +1,80 @@
+---
+title: CLI Commands
+description: Command-line interface for CsvQuery.
+---
+
+# CLI Commands
+
+The `csvquery` binary provides a command-line interface for indexing, querying, and managing CSV data.
+
+## Usage
+
+```bash
+csvquery <command> [arguments]
+```
+
+## Commands
+
+### index
+
+Creates B-Tree and Bitmap indexes from a CSV file.
+
+```bash
+csvquery index --input <csv> --output <dir> --columns <json>
+```
+
+**Flags:**
+- `--input` (string): Path to input CSV file.
+- `--output` (string): Output directory for indexes (default: input directory).
+- `--columns` (json): JSON array of column definitions (e.g., `'["col1", ["col2", "col3"]]'`).
+- `--workers` (int): Number of parallel workers (default: NumCPU).
+- `--memory` (int): Memory limit per worker in MB (default: 500).
+- `--verbose` (bool): Enable verbose output.
+
+### query
+
+Executes a query against the CSV using available indexes.
+
+```bash
+csvquery query --csv <file> --where <json>
+```
+
+**Flags:**
+- `--csv` (string): Path to CSV file.
+- `--index-dir` (string): Directory containing index files.
+- `--where` (json): JSON object of conditions (e.g., `'{"col1": "val"}'`).
+- `--limit` (int): Maximum results.
+- `--offset` (int): Results to skip.
+- `--count` (bool): Only output the count of matching rows.
+- `--explain` (bool): Output the query execution plan.
+
+### daemon
+
+Starts the high-performance Unix Socket / TCP server.
+
+```bash
+csvquery daemon --socket /tmp/csvquery.sock
+```
+
+**Flags:**
+- `--socket` (string): Unix socket path.
+- `--host` (string): TCP host (default: 127.0.0.1).
+- `--port` (int): TCP port (if specified, uses TCP instead of Unix socket).
+- `--workers` (int): Max concurrency.
+
+### write
+
+Appends data to a CSV file efficiently.
+
+```bash
+csvquery write --csv <file> --data <json>
+```
+
+**Flags:**
+- `--csv` (string): Path to CSV file.
+- `--data` (json): JSON array of rows to append.
+- `--headers` (json): JSON array of headers (if creating a new file).
+
+### version
+
+Prints the version information.

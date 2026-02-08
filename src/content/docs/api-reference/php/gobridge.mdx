@@ -1,0 +1,62 @@
+---
+title: GoBridge
+description: PHP wrapper for the CsvQuery Go binary.
+---
+
+# GoBridge
+
+`Entreya\CsvQuery\Bridge\GoBridge`
+
+The `GoBridge` class handles the communication between PHP and the compiled Go binary. It manages process execution, data serialization, and result streaming.
+
+## Constructor
+
+```php
+public function __construct(array $options = [])
+```
+
+**Parameters:**
+- `options` (array): Configuration options.
+    - `workers` (int): Number of workers (0 = auto).
+    - `memoryMB` (int): Memory per worker.
+    - `binaryPath` (string): Override binary path.
+    - `useSocket` (bool): Use Unix socket if available (default: `true`).
+    - `indexDir` (string): Index directory for socket client.
+
+## Methods
+
+### createIndex()
+
+```php
+public function createIndex(string $csvPath, string $outputDir, string $columnsJson, string $separator = ',', bool $verbose = false, array $options = []): bool
+```
+
+Executes the `index` command on the Go binary.
+
+### query()
+
+```php
+public function query(string $csvPath, string $indexDir, array $where, int $limit = 0, int $offset = 0, bool $explain = false, ?string $groupBy = null, ?string $aggCol = null, ?string $aggFunc = null): \Generator|array
+```
+
+Executes the `query` command on the Go binary (or via socket).
+
+**Returns:**
+- `\Generator`: Yields result rows (offsets) for standard queries.
+- `array`: Returns aggregation results or query plans for complex queries.
+
+### update()
+
+```php
+public function update(string $csvPath, string $setClause, ?string $whereJson = null, string $indexDir = ''): int
+```
+
+Executes the `update` command.
+
+### getVersion()
+
+```php
+public function getVersion(): string
+```
+
+Returns the version string of the underlying Go binary.

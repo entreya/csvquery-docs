@@ -4,6 +4,7 @@
    ======================================== */
 
 @import './tokens.css';
+@import './prism.css';
 
 /* CSS Reset */
 *,
@@ -60,7 +61,7 @@ body {
     outline-offset: 2px;
 }
 
-/* Links - Purple accent with underline for non-color identification */
+/* Links */
 a {
     color: var(--link-color);
     text-decoration: underline;
@@ -94,6 +95,12 @@ code {
     color: var(--text-inline-code);
 }
 
+/* Helper to ensure no double style on prism blocks if any leak */
+:not(pre)>code[class*="language-"] {
+    background-color: var(--bg-inline-code);
+    /* fall back to theme */
+}
+
 pre {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
@@ -109,7 +116,7 @@ pre code {
     border: none;
 }
 
-/* Headings - Proper hierarchy for screen readers */
+/* Headings */
 h1,
 h2,
 h3,
@@ -135,6 +142,7 @@ h2 {
     font-size: var(--text-2xl);
     padding-bottom: var(--space-2);
     border-bottom: 1px solid var(--border-primary);
+    margin-top: var(--space-10);
 }
 
 h3 {
@@ -185,7 +193,7 @@ li::marker {
     color: var(--primary-500);
 }
 
-/* Tables - Dark theme style with proper accessibility */
+/* Tables */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -209,7 +217,6 @@ th {
     background-color: var(--bg-tertiary);
 }
 
-/* Ensure table headers are announced properly */
 th[scope="col"],
 th[scope="row"] {
     font-weight: 600;
@@ -241,14 +248,13 @@ blockquote p:last-child {
     margin-bottom: 0;
 }
 
-/* Images - Ensure they have proper alt text reminder */
+/* Images */
 img {
     max-width: 100%;
     height: auto;
     border-radius: var(--radius-lg);
 }
 
-/* Images without alt text get a red border (dev helper) */
 img:not([alt]) {
     outline: 3px solid var(--accent-error);
 }
@@ -272,7 +278,7 @@ strong {
     color: var(--text-primary);
 }
 
-/* Scrollbar - Dark theme */
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -291,19 +297,18 @@ strong {
     background: var(--scrollbar-thumb-hover);
 }
 
-/* Focus Styles - High visibility for keyboard navigation */
+/* Focus Styles */
 :focus-visible {
     outline: 3px solid var(--primary-500);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
 
-/* Remove outline for mouse users */
 :focus:not(:focus-visible) {
     outline: none;
 }
 
-/* Button Base - Pill shaped */
+/* Buttons */
 button {
     font-family: inherit;
     cursor: pointer;
@@ -312,13 +317,11 @@ button {
     transition: all var(--transition-fast);
 }
 
-/* Ensure buttons have visible focus state */
 button:focus-visible {
     outline: 3px solid var(--primary-500);
     outline-offset: 2px;
 }
 
-/* Primary Button - Purple pill */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -346,7 +349,6 @@ button:focus-visible {
     outline-offset: 2px;
 }
 
-/* Secondary Button */
 .btn-secondary {
     display: inline-flex;
     align-items: center;
@@ -372,7 +374,6 @@ button:focus-visible {
     outline-offset: 2px;
 }
 
-/* Visually Hidden - For screen readers only */
 .sr-only {
     position: absolute;
     width: 1px;

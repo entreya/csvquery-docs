@@ -1,0 +1,65 @@
+---
+title: Indexer
+description: High-performance pipelined CSV indexer.
+---
+
+# Indexer
+
+`github.com/entreya/csvquery/internal/indexer`
+
+The `Indexer` builds B-Tree and Bitmap indexes from CSV files. It uses a pipelined architecture with parallel workers to process large datasets efficiently.
+
+## IndexerConfig
+
+```go
+type IndexerConfig struct {
+    InputFile   string  // CSV path
+    OutputDir   string  // Output directory
+    Columns     string  // JSON column definitions
+    Workers     int     // Parallel workers
+    MemoryMB    int     // Memory limit per worker
+    BloomFPRate float64 // Bloom filter false positive rate
+}
+```
+
+## Architecture
+
+The indexing process consists of two phases:
+
+1.  **Scanning (Parallel)**:
+    -   The `Scanner` reads the CSV using memory mapping.
+    -   Multiple workers parse lines and extract keys for target columns.
+    -   Use SIMD/SWAR for fast delimiter detection.
+
+2.  **Sorting & Spilling**:
+    -   Extracted keys are sent to `Sorter` instances (one per index).
+    -   Sorters buffer data in memory up to `MemoryMB`.
+    -   When full, data is sorted and spilled to temporary files.
+
+3.  **Merging**:
+    -   Resulting spill files are merged using a k-way merge sort.
+    -   The final B-Tree and Bitmap index files are written.
+
+## Methods
+
+### NewIndexer
+
+```go
+func NewIndexer(config IndexerConfig) *Indexer
+```
+
+### Run
+
+```go
+func (indexer *Indexer) Run() error
+```
+
+Executes the full indexing pipeline.
+
+### Cleanup
+
+```go
+func (indexer *Indexer) Cleanup()
+```
+
+Removes temporary files and directories created during indexing.

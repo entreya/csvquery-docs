@@ -1,0 +1,53 @@
+---
+title: Column
+description: Represents a column-oriented view of a row's data.
+---
+
+# Column
+
+`Entreya\CsvQuery\Models\Column`
+
+The `Column` class represents a specific field within a row, providing utility methods for data manipulation.
+
+## Methods
+
+### getValue()
+
+```php
+public function getValue(): mixed
+```
+
+Returns the raw value of the column.
+
+### getName()
+
+```php
+public function getName(): ?string
+```
+
+Returns the column header name.
+
+### getCell()
+
+```php
+public function getCell(): Cell
+```
+
+Converts the column to a `Cell` object.
+
+### trim()
+
+```php
+public function trim(): string
+```
+
+Returns the value with whitespace trimmed.
+
+### toUpper() / toLower()
+
+```php
+public function toUpper(): string
+public function toLower(): string
+```
+
+Returns the value converted to upper or lower case.

@@ -1,0 +1,107 @@
+---
+title: CsvQuery
+description: Primary entry point for the CsvQuery library.
+---
+
+# CsvQuery
+
+`Entreya\CsvQuery\Core\CsvQuery`
+
+The `CsvQuery` class is the main entry point for interacting with CSV files. It handles indexing, querying, and data manipulation by acting as a bridge to the high-performance Go engine.
+
+## Constructor
+
+```php
+public function __construct(string $csvPath, array $options = [])
+```
+
+Initializes a new CsvQuery instance.
+
+**Parameters:**
+
+- `csvPath` (string): Absolute or relative path to the CSV file.
+- `options` (array): Configuration options.
+    - `indexDir` (string): Directory to store indexes (default: same as CSV).
+    - `separator` (string): CSV delimiter (default: `,`).
+    - `workers` (int): Number of indexing workers (default: auto).
+    - `memoryMB` (int): Memory limit per worker in MB (default: 500).
+    - `binaryPath` (string): Path to custom `csvquery` binary.
+
+**Throws:**
+
+- `\InvalidArgumentException`: If the CSV file does not exist.
+
+## Methods
+
+### find()
+
+```php
+public function find(): ActiveQuery
+```
+
+Creates a new `ActiveQuery` instance for building fluent queries.
+
+**Returns:**
+- `ActiveQuery`: Query builder instance.
+
+### createIndex()
+
+```php
+public function createIndex(array $columns, bool $verbose = false, array $options = []): bool
+```
+
+Creates optimized B-Tree and Bitmap indexes for specified columns.
+
+**Parameters:**
+- `columns` (array): List of columns to index. Can be strings (single column) or arrays (composite).
+- `verbose` (bool): Enable verbose output (default: `false`).
+- `options` (array): Additional indexer options.
+
+**Returns:**
+- `bool`: `true` on success, `false` on failure.
+
+### update()
+
+```php
+public function update(array $attributes, array $conditions = []): int
+```
+
+Updates rows matching the conditions. Uses a sidecar mechanism (`_updates.json`) to persist changes without rewriting the entire CSV.
+
+**Parameters:**
+- `attributes` (array): Associative array of column-value pairs to update.
+- `conditions` (array): Filter conditions (e.g., `['id' => 123]`).
+
+**Returns:**
+- `int`: Number of affected rows.
+
+### validateIntegrity()
+
+```php
+public function validateIntegrity(): bool
+```
+
+Validates if the existing indexes match the current CSV file state using size, modification time, and cryptographic DNA (hash).
+
+**Returns:**
+- `bool`: `true` if indexes are valid, `false` if stale.
+
+### getHeaders()
+
+```php
+public function getHeaders(): array
+```
+
+Returns the list of column headers from the CSV file.
+
+### addVirtualColumn()
+
+```php
+public function addVirtualColumn(string $name, string $expression): self
+```
+
+Defines a virtual column generated at runtime (not stored in CSV).
+
+**Parameters:**
+- `name` (string): Name of the new column.
+- `expression` (string): Expression to generate value (currently limited logic).

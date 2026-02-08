@@ -1,0 +1,62 @@
+---
+title: Daemon
+description: Long-running server for persistent connections.
+---
+
+# Daemon
+
+`github.com/entreya/csvquery/internal/server`
+
+The `Daemon` provides a long-running server that listens on a Unix Domain Socket or TCP port. It eliminates the startup cost of the Go binary for frequent queries.
+
+## ServerConfig
+
+```go
+type ServerConfig struct {
+    Port           int // TCP port (0 for Unix socket)
+    MaxConcurrency int // Max concurrent requests
+}
+```
+
+## Protocol
+
+The daemon uses a simple JSON-lines protocol. Each request and response is a single line of JSON.
+
+### Request
+
+```json
+{
+  "command": "query",
+  "params": {
+    "csv_path": "data.csv",
+    "index_dir": "./indexes",
+    "where": [],
+    "limit": 10
+  }
+}
+```
+
+### Response
+
+```json
+{
+  "status": "ok",
+  "data": [ ...rows... ]
+}
+```
+
+## Methods
+
+### NewDaemon
+
+```go
+func NewDaemon(cfg ServerConfig) *Daemon
+```
+
+### Start
+
+```go
+func (s *Daemon) Start() error
+```
+
+Starts the main loop, accepting connections and dispatching them to worker goroutines.

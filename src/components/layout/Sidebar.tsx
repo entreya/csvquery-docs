@@ -8,6 +8,78 @@ interface SidebarProps {
     onClose: () => void;
 }
 
+// Recursive Nav Item Component
+function SidebarItem({ item, onClose }: { item: import('../../lib/navigation').NavItem, onClose: () => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();
+
+    // Auto-expand if active child
+    useEffect(() => {
+        if (item.items) {
+            const hasActiveChild = item.items.some(child =>
+                (child.href && location.pathname === child.href) ||
+                (child.items && child.items.some(grandChild => grandChild.href === location.pathname))
+            );
+            if (hasActiveChild) {
+                setIsOpen(true);
+            }
+        }
+    }, [location.pathname, item.items]);
+
+    if (item.items) {
+        return (
+            <li className={styles.nestedGroup}>
+                <button
+                    className={styles.nestedHeader}
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-expanded={isOpen}
+                >
+                    <span className={styles.nestedTitle}>{item.title}</span>
+                    <svg
+                        className={`${styles.chevron} ${isOpen ? styles.rotate : ''}`}
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                    >
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                {isOpen && (
+                    <ul className={styles.nestedList}>
+                        {item.items.map(subItem => (
+                            <SidebarItem key={subItem.title} item={subItem} onClose={onClose} />
+                        ))}
+                    </ul>
+                )}
+            </li>
+        );
+    }
+
+    if (!item.href) return null;
+
+    return (
+        <li>
+            <NavLink
+                to={item.href}
+                end={true}
+                className={({ isActive }) =>
+                    `${styles.link} ${isActive ? styles.active : ''}`
+                }
+                onClick={() => {
+                    if (window.innerWidth < 1024) {
+                        onClose();
+                    }
+                }}
+            >
+                {item.title}
+            </NavLink>
+        </li>
+    );
+}
+
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const [openSections, setOpenSections] = useState<string[]>(
         navigation.map(n => n.title) // start all open
@@ -18,9 +90,14 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     // Auto-expand logic based on active route
     useEffect(() => {
         navigation.forEach(section => {
-            const hasActiveLink = section.items.some(item =>
-                item.href === location.pathname || location.pathname.startsWith(item.href + '/')
-            );
+            const hasActiveLink = section.items.some(item => {
+                if (item.href === location.pathname) return true;
+                if (item.items) {
+                    // Check children
+                    return item.items.some(child => child.href === location.pathname || (child.items && child.items.some(g => g.href === location.pathname)));
+                }
+                return false;
+            });
 
             if (hasActiveLink && !openSections.includes(section.title)) {
                 setOpenSections(prev => [...prev, section.title]);
@@ -59,7 +136,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             className={styles.brandingLogo}
                         />
                         <div className={styles.brandingText}>
-                            {/* "entreya" text removed as requested */}
                             <span className={styles.libName}>csvquery</span>
                         </div>
                     </Link>
@@ -92,27 +168,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                                 <div className={`${styles.sectionContent} ${isSectionOpen ? styles.show : ''}`}>
                                     <ul className={styles.list}>
-                                        {section.items.map((item) => {
-                                            return (
-                                                <li key={item.href}>
-                                                    <NavLink
-                                                        to={item.href}
-                                                        end={true}
-                                                        className={({ isActive }) =>
-                                                            `${styles.link} ${isActive ? styles.active : ''}`
-                                                        }
-                                                        onClick={() => {
-                                                            // Close sidebar on mobile when link clicked
-                                                            if (window.innerWidth < 1024) {
-                                                                onClose();
-                                                            }
-                                                        }}
-                                                    >
-                                                        {item.title}
-                                                    </NavLink>
-                                                </li>
-                                            );
-                                        })}
+                                        {section.items.map((item) => (
+                                            <SidebarItem key={item.title} item={item} onClose={onClose} />
+                                        ))}
                                     </ul>
                                 </div>
                             </div>
