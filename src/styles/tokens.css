@@ -196,21 +196,21 @@
     --bg-code: #F3F4F6;
     --text-code: #111827;
 
-    /* Syntax Highlighting - Light Mode (GitHub-inspired) */
-    --token-comment: #6e7781;
-    --token-punctuation: #24292f;
-    --token-property: #0550ae;
-    --token-selector: #116329;
-    --token-operator: #0550ae;
-    --token-attr: #cf222e;
-    --token-variable: #953800;
-    --token-function: #8250df;
-    --token-keyword: #cf222e;
-    --token-regex: #116329;
-    --token-number: #0550ae;
-    --token-boolean: #0550ae;
-    --token-string: #0a3069;
-    --token-class: #953800;
+    /* Syntax Highlighting - Light Mode (GitHub/VSCode Light inspired) */
+    --token-comment: #6a737d;
+    --token-punctuation: #24292e;
+    --token-property: #005cc5;
+    --token-selector: #22863a;
+    --token-operator: #d73a49;
+    --token-attr: #6f42c1;
+    --token-variable: #e36209;
+    --token-function: #6f42c1;
+    --token-keyword: #d73a49;
+    --token-regex: #032f62;
+    --token-number: #005cc5;
+    --token-boolean: #005cc5;
+    --token-string: #032f62;
+    --token-class: #6f42c1;
 }
 
 /* Reduced motion preference */

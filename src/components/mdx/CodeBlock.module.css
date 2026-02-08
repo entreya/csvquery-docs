@@ -6,6 +6,7 @@
     background-color: var(--bg-code);
     border: 1px solid var(--border-code);
     transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    box-shadow: none;
 }
 
 .header {
@@ -95,8 +96,6 @@
 
 /* Keywords, Functions */
 .code :global(.token.keyword),
-.code :global(.token.function),
-.code :global(.token.class-name),
 .code :global(.token.atrule),
 .code :global(.token.attr-value),
 .code :global(.token.php),
@@ -104,6 +103,14 @@
 .code :global(.token.package),
 .code :global(.token.namespace) {
     color: var(--token-keyword);
+}
+
+.code :global(.token.function) {
+    color: var(--token-function);
+}
+
+.code :global(.token.class-name) {
+    color: var(--token-class);
 }
 
 /* Strings, Characters */
