@@ -1,0 +1,179 @@
+/* Header - Entreya Dark Theme - WCAG Compliant */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-height);
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-primary);
+    backdrop-filter: blur(12px);
+}
+
+.container {
+    max-width: 1400px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Center the right group */
+    gap: var(--space-6);
+    position: relative;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    position: absolute;
+    /* Take out of flow to allow perfect centering */
+    left: var(--space-6);
+}
+
+.menuButton {
+    display: none;
+    padding: var(--space-2);
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.menuButton:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+}
+
+.menuButton:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1024px) {
+    .menuButton {
+        display: flex;
+    }
+}
+
+/* Right Section - Now Centered via Container */
+.right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    /* Increased gap for better spacing */
+    width: 100%;
+    max-width: 800px;
+    /* Constrain the centered group */
+    justify-content: center;
+}
+
+/* Search Button - Big and Prominent */
+.searchButton {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 44px;
+    /* Big height */
+    padding: 0 var(--space-4);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-pill);
+    color: var(--text-secondary);
+    font-size: var(--text-base);
+    /* Larger text */
+    transition: all var(--transition-fast);
+    flex: 1;
+    /* Allow to grow */
+    max-width: 500px;
+    /* Target width */
+    cursor: pointer;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+}
+
+.searchButton:hover {
+    border-color: var(--primary-500);
+    background-color: var(--bg-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.searchButton:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .left {
+        position: static;
+        /* Revert on mobile */
+    }
+
+    .container {
+        justify-content: space-between;
+        /* Revert on mobile */
+    }
+
+    .right {
+        width: auto;
+        flex: 1;
+        justify-content: flex-end;
+    }
+
+    .searchButton {
+        height: 36px;
+        min-width: auto;
+        padding: 0 var(--space-2);
+        width: 36px;
+        flex: 0 0 36px;
+        justify-content: center;
+    }
+
+    .searchText,
+    .kbd {
+        display: none;
+    }
+}
+
+.searchText {
+    flex: 1;
+    text-align: left;
+    line-height: normal;
+}
+
+.kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    padding: 0 8px;
+    font-size: var(--text-xs);
+    font-family: var(--font-sans);
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    line-height: 1;
+    border: 1px solid var(--border-secondary);
+}
+
+/* Icon Buttons */
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    /* Bigger touch target */
+    height: 44px;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.iconButton:hover {
+    color: var(--primary-500);
+    background-color: var(--bg-hover);
+}
+
+.iconButton:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+}

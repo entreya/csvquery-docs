@@ -1,0 +1,386 @@
+/* ========================================
+   Entreya Brand Global Styles
+   WCAG 2.1 Level AA Compliant
+   ======================================== */
+
+@import './tokens.css';
+
+/* CSS Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Base Styles */
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-height) + var(--space-4));
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+body {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.7;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Skip Link - Accessibility for keyboard users */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: var(--space-4);
+    z-index: 9999;
+    padding: var(--space-3) var(--space-6);
+    background: var(--primary-500);
+    color: white;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: top var(--transition-fast);
+}
+
+.skip-link:focus {
+    top: var(--space-4);
+    outline: 3px solid var(--primary-300);
+    outline-offset: 2px;
+}
+
+/* Links - Purple accent with underline for non-color identification */
+a {
+    color: var(--link-color);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--link-hover);
+    text-decoration-thickness: 2px;
+}
+
+/* Remove underline for navigation-style links (optional class) */
+a.nav-link {
+    text-decoration: none;
+}
+
+a.nav-link:hover {
+    text-decoration: none;
+}
+
+/* Code */
+code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    padding: 0.15em 0.4em;
+    background-color: var(--bg-inline-code);
+    border: 1px solid var(--border-inline-code);
+    border-radius: var(--radius-sm);
+    color: var(--text-inline-code);
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+    overflow-x: auto;
+    border: none;
+}
+
+pre code {
+    padding: 0;
+    background: none;
+    color: inherit;
+    border: none;
+}
+
+/* Headings - Proper hierarchy for screen readers */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-4);
+    scroll-margin-top: calc(var(--header-height) + var(--space-6));
+}
+
+h1 {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    margin-top: 0;
+    letter-spacing: -0.02em;
+}
+
+h2 {
+    font-size: var(--text-2xl);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+h3 {
+    font-size: var(--text-xl);
+}
+
+h4 {
+    font-size: var(--text-lg);
+}
+
+/* Ensure heading IDs have visible focus when linked */
+h1:target,
+h2:target,
+h3:target,
+h4:target {
+    animation: highlight 2s ease;
+}
+
+@keyframes highlight {
+    0% {
+        background-color: rgba(139, 92, 246, 0.2);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Paragraphs */
+p {
+    margin-bottom: var(--space-4);
+    color: var(--text-secondary);
+}
+
+/* Lists */
+ul,
+ol {
+    margin-bottom: var(--space-4);
+    padding-left: var(--space-6);
+    color: var(--text-secondary);
+}
+
+li {
+    margin-bottom: var(--space-2);
+}
+
+li::marker {
+    color: var(--primary-500);
+}
+
+/* Tables - Dark theme style with proper accessibility */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-6);
+    font-size: var(--text-sm);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+th {
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+}
+
+/* Ensure table headers are announced properly */
+th[scope="col"],
+th[scope="row"] {
+    font-weight: 600;
+}
+
+td {
+    color: var(--text-secondary);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: var(--bg-hover);
+}
+
+/* Blockquotes */
+blockquote {
+    margin: var(--space-4) 0;
+    padding: var(--space-4) var(--space-6);
+    border-left: 4px solid var(--primary-500);
+    background-color: var(--bg-secondary);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    color: var(--text-secondary);
+}
+
+blockquote p:last-child {
+    margin-bottom: 0;
+}
+
+/* Images - Ensure they have proper alt text reminder */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+}
+
+/* Images without alt text get a red border (dev helper) */
+img:not([alt]) {
+    outline: 3px solid var(--accent-error);
+}
+
+/* Horizontal Rule */
+hr {
+    border: none;
+    border-top: 1px solid var(--border-primary);
+    margin: var(--space-8) 0;
+}
+
+/* Strong */
+strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Selection */
+::selection {
+    background-color: rgba(139, 92, 246, 0.3);
+    color: var(--text-primary);
+}
+
+/* Scrollbar - Dark theme */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+/* Focus Styles - High visibility for keyboard navigation */
+:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Remove outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Button Base - Pill shaped */
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: none;
+    transition: all var(--transition-fast);
+}
+
+/* Ensure buttons have visible focus state */
+button:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* Primary Button - Purple pill */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--primary-500);
+    color: white;
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.btn-primary:hover {
+    background: var(--primary-600);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-primary:focus-visible {
+    outline: 3px solid var(--primary-300);
+    outline-offset: 2px;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-primary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--primary-500);
+    text-decoration: none;
+}
+
+.btn-secondary:focus-visible {
+    outline: 3px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* Visually Hidden - For screen readers only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

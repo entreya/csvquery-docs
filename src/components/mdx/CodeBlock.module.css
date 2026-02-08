@@ -1,0 +1,125 @@
+/* CodeBlock - Entreya Theme with Dynamic Syntax Highlighting */
+.container {
+    margin: var(--space-4) 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--bg-code);
+    border: 1px solid var(--border-code);
+    transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-4);
+    background-color: rgba(0, 0, 0, 0.03);
+    /* Subtle tint instead of pure dark */
+    border-bottom: 1px solid var(--border-code);
+}
+
+/* In Dark mode, make header slightly lighter than bg */
+:global([data-theme="dark"]) .header {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.language {
+    font-size: var(--text-xs);
+    font-weight: 500;
+    color: var(--text-code-header);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.copyButton {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.copyButton:hover {
+    color: var(--text-code);
+    background-color: var(--bg-hover);
+}
+
+.pre {
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+}
+
+.code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: 1.7;
+    color: var(--text-code);
+    white-space: pre;
+    /* Force no wrap */
+}
+
+/* Syntax Highlighting */
+
+/* Comments */
+.code :global(.token.comment),
+.code :global(.token.prolog),
+.code :global(.token.doctype),
+.code :global(.token.cdata) {
+    color: var(--token-comment);
+    font-style: italic;
+}
+
+/* Punctuation */
+.code :global(.token.punctuation) {
+    color: var(--token-punctuation);
+}
+
+/* Keywords, Functions */
+.code :global(.token.keyword),
+.code :global(.token.function),
+.code :global(.token.class-name),
+.code :global(.token.atrule),
+.code :global(.token.attr-value),
+.code :global(.token.php),
+.code :global(.token.delimiter) {
+    color: var(--token-keyword);
+}
+
+/* Strings, Characters */
+.code :global(.token.string),
+.code :global(.token.char),
+.code :global(.token.builtin),
+.code :global(.token.inserted),
+.code :global(.token.selector),
+.code :global(.token.attr-name) {
+    color: var(--token-string);
+}
+
+/* Numbers, Booleans, Tags */
+.code :global(.token.property),
+.code :global(.token.tag),
+.code :global(.token.boolean),
+.code :global(.token.number),
+.code :global(.token.constant),
+.code :global(.token.symbol),
+.code :global(.token.deleted) {
+    color: var(--token-number);
+}
+
+/* Operators, URLs */
+.code :global(.token.operator),
+.code :global(.token.entity),
+.code :global(.token.url),
+.code :global(.token.variable) {
+    color: var(--token-operator);
+}
+
+/* Regex */
+.code :global(.token.regex),
+.code :global(.token.important) {
+    color: var(--token-variable);
+}

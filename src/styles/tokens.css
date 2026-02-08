@@ -1,0 +1,240 @@
+/* ========================================
+   Entreya Brand Design Tokens
+   WCAG 2.1 Level AA Compliant
+   ======================================== */
+
+:root {
+    /* Primary Purple - Vibrant Purple for CTAs, links, highlights */
+    /* Entreya Purple: #8B5CF6 (Violet 500) */
+    --primary-50: #f5f3ff;
+    --primary-100: #ede9fe;
+    --primary-200: #ddd6fe;
+    --primary-300: #c4b5fd;
+    --primary-400: #a78bfa;
+    --primary-500: #8B5CF6;
+    --primary-600: #7c3aed;
+    --primary-700: #6d28d9;
+    --primary-800: #5b21b6;
+    --primary-900: #4c1d95;
+
+    /* Accent - Warning/Info colors (WCAG compliant) */
+    --accent-warning: #D97706;
+    --accent-error: #DC2626;
+    --accent-success: #059669;
+    --accent-info: #0284C7;
+
+    /* Spacing Scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+
+    /* Typography */
+    --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+
+    /* Layout */
+    --header-height: 64px;
+    --sidebar-width: 280px;
+    --toc-width: 220px;
+    --content-max-width: 780px;
+
+    /* Borders */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-pill: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.25);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
+    --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+
+    /* Focus ring */
+    --focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.5);
+    --focus-ring-offset: 0 0 0 2px var(--bg-primary);
+
+    /* Code Block Background - Consistent Dark (Gary 900) */
+    --bg-code: #111827;
+
+    /* Syntax Highlighting - Default Dark (Dracula-inspired) */
+    --token-comment: #6272a4;
+    --token-punctuation: #f8f8f2;
+    --token-property: #ff79c6;
+    --token-selector: #bd93f9;
+    --token-operator: #ff79c6;
+    --token-attr: #50fa7b;
+    --token-variable: #f8f8f2;
+    --token-function: #50fa7b;
+    --token-keyword: #ff79c6;
+    --token-regex: #f1fa8c;
+    --token-number: #bd93f9;
+    --token-boolean: #bd93f9;
+    --token-string: #f1fa8c;
+    --token-class: #8be9fd;
+}
+
+/* Dark theme (default - Entreya brand) */
+[data-theme="dark"] {
+    --bg-primary: #0F172A;
+    /* Slate 900 */
+    --bg-secondary: #1E293B;
+    /* Slate 800 */
+    --bg-tertiary: #334155;
+    /* Slate 700 */
+    --bg-hover: rgba(139, 92, 246, 0.15);
+
+    /* Text colors */
+    --text-primary: #F8FAFC;
+    /* Slate 50 */
+    --text-secondary: #E2E8F0;
+    /* Slate 200 */
+    --text-tertiary: #CBD5E1;
+    /* Slate 300 */
+    --text-muted: #94A3B8;
+    /* Slate 400 */
+
+    --border-primary: #334155;
+    /* Slate 700 */
+    --border-secondary: #1E293B;
+    --border-accent: rgba(139, 92, 246, 0.4);
+
+    /* Links */
+    --link-color: #A78BFA;
+    --link-hover: #C4B5FD;
+
+    /* Inline Code */
+    --bg-inline-code: #1E293B;
+    /* Slate 800 */
+    --text-inline-code: #A78BFA;
+    /* Purple 400 */
+    --border-inline-code: #334155;
+
+    --scrollbar-track: #1E293B;
+    --scrollbar-thumb: #475569;
+    --scrollbar-thumb-hover: #64748B;
+
+    /* Semantic Callout Colors - High Contrast */
+    --color-note: #A78BFA;
+    --color-tip: #34D399;
+    --color-warning: #FBBF24;
+    --color-danger: #F87171;
+    --color-info: #38BDF8;
+}
+
+/* Light theme */
+[data-theme="light"] {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    /* Gray 50 */
+    --bg-tertiary: #F3F4F6;
+    /* Gray 100 */
+    --bg-hover: rgba(139, 92, 246, 0.1);
+
+    /* Text colors */
+    --text-primary: #111827;
+    /* Gray 900 */
+    --text-secondary: #374151;
+    /* Gray 700 */
+    --text-tertiary: #4B5563;
+    /* Gray 600 */
+    --text-muted: #6B7280;
+    /* Gray 500 */
+
+    --border-primary: #E5E7EB;
+    /* Gray 200 */
+    --border-secondary: #F3F4F6;
+    --border-accent: rgba(139, 92, 246, 0.4);
+
+    /* Links */
+    --link-color: #7C3AED;
+    --link-hover: #6D28D9;
+
+    /* Inline Code */
+    --bg-inline-code: #F1F5F9;
+    /* Slate 100 */
+    --text-inline-code: #6D28D9;
+    /* Purple 700 */
+    --border-inline-code: #E2E8F0;
+
+    --scrollbar-track: #F3F4F6;
+    --scrollbar-thumb: #D1D5DB;
+    --scrollbar-thumb-hover: #9CA3AF;
+
+    /* Semantic Callout Colors - Darker for Light Mode */
+    --color-note: #7C3AED;
+    --color-tip: #059669;
+    --color-warning: #D97706;
+    --color-danger: #DC2626;
+    --color-info: #0284C7;
+
+    /* Light Mode Code Overrides for Readability */
+    --bg-code: #F3F4F6;
+    --text-code: #111827;
+
+    /* Syntax Highlighting - Light Mode (GitHub-inspired) */
+    --token-comment: #6e7781;
+    --token-punctuation: #24292f;
+    --token-property: #0550ae;
+    --token-selector: #116329;
+    --token-operator: #0550ae;
+    --token-attr: #cf222e;
+    --token-variable: #953800;
+    --token-function: #8250df;
+    --token-keyword: #cf222e;
+    --token-regex: #116329;
+    --token-number: #0550ae;
+    --token-boolean: #0550ae;
+    --token-string: #0a3069;
+    --token-class: #953800;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0ms;
+        --transition-normal: 0ms;
+        --transition-slow: 0ms;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    [data-theme="dark"] {
+        --text-secondary: #FFFFFF;
+        --text-tertiary: #FFFFFF;
+        --text-muted: #E2E8F0;
+        --border-primary: rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="light"] {
+        --text-secondary: #0F172A;
+        --text-tertiary: #1E293B;
+        --text-muted: #334155;
+        --border-primary: rgba(0, 0, 0, 0.25);
+    }
+}

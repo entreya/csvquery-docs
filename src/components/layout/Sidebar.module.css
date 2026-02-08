@@ -1,0 +1,219 @@
+/* Sidebar - Entreya Dark Theme - WCAG Compliant */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 40;
+    backdrop-filter: blur(4px);
+}
+
+@media (min-width: 1025px) {
+    .overlay {
+        display: none;
+    }
+}
+
+.sidebar {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    /* Removed global padding to allow full-width active links */
+    /* padding: var(--space-4); */
+    background-color: var(--bg-primary);
+    border-right: 1px solid var(--border-primary);
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+@media (min-width: 1025px) {
+    .sidebar {
+        transform: translateX(0);
+        /* padding-top: var(--space-4); Keep padding top for visual space? */
+    }
+}
+
+/* Branding Header */
+.branding {
+    /* Apply padding here since we removed it from sidebar */
+    padding: var(--space-6) var(--space-4) var(--space-4) var(--space-4);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.brandingLink {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.brandingLogo {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+}
+
+.brandingText {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.orgName {
+    display: none;
+}
+
+.libName {
+    font-size: var(--text-base);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Navigation */
+.nav {
+    display: flex;
+    flex-direction: column;
+    /* padding-bottom: var(--space-8); */
+    flex: 1;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--space-2);
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    text-align: left;
+    /* Add padding to match visual hierarchy */
+    padding: var(--space-2) var(--space-4);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: color var(--transition-fast);
+}
+
+.sectionHeader:hover {
+    color: var(--text-primary);
+}
+
+.sectionHeader.activeParent {
+    color: var(--primary-500);
+}
+
+.sectionTitle {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chevron {
+    transition: transform var(--transition-normal);
+    opacity: 0.7;
+}
+
+.chevron.expanded {
+    transform: rotate(180deg);
+}
+
+.sectionContent {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--transition-normal);
+}
+
+.sectionContent.show {
+    grid-template-rows: 1fr;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+}
+
+/* Links structure */
+.link {
+    display: block;
+    /* Apply horizontal padding here to align text */
+    padding: var(--space-1) var(--space-4);
+    /* Indent child items slightly more? User said "touch separator" for active link. */
+    padding-left: calc(var(--space-4) + var(--space-2));
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    line-height: 1.5;
+    position: relative;
+    border-right: 4px solid transparent;
+    /* Reserve space/layout for border */
+}
+
+/* Indent subsection links deeper if needed? 
+   No, simpler: All links flush left visually, but text indented. */
+
+.link:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-hover);
+}
+
+.link:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--primary-500);
+}
+
+/* Active State */
+.link.active {
+    color: var(--link-color);
+    background-color: rgba(139, 92, 246, 0.15);
+    font-weight: 600;
+
+    /* Since container has 0 padding, this element spans full width (minus sidebar scrollbar if any) */
+    /* Just add the border */
+    border-right: 4px solid var(--primary-500);
+    /* Note: "touching the right line" means border-right on this element meets sidebar border-right */
+}
+
+/* Close button for mobile */
+.closeButton {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    z-index: 60;
+}
+
+@media (min-width: 1025px) {
+    .closeButton {
+        display: none;
+    }
+}

@@ -1,0 +1,170 @@
+/* HomePage - Entreya Dark Theme */
+.hero {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    padding: var(--space-12) 0;
+}
+
+.badge {
+    display: inline-flex;
+    padding: var(--space-1) var(--space-4);
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    color: var(--primary-400);
+    margin-bottom: var(--space-6);
+}
+
+.title {
+    font-size: clamp(var(--text-3xl), 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.highlight {
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+}
+
+.features {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-8);
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-primary);
+}
+
+.featureIcon {
+    font-size: 1.2em;
+}
+
+.featureText {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.cta {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-12);
+}
+
+/* Primary CTA - Purple pill button */
+.primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-8);
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+    color: white;
+    font-weight: 600;
+    font-size: var(--text-base);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+    text-decoration: none;
+    color: white;
+}
+
+/* Secondary CTA */
+.secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-8);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-base);
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    border: 1px solid var(--border-primary);
+    transition: all var(--transition-fast);
+}
+
+.secondary:hover {
+    background-color: var(--bg-tertiary);
+    border-color: var(--primary-500);
+    text-decoration: none;
+}
+
+.codePreview {
+    text-align: left;
+    margin-bottom: var(--space-12);
+}
+
+.codeHeaderTitle {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-4);
+    text-align: center;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-6);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-primary);
+}
+
+.statValue {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--primary-400);
+    letter-spacing: -0.02em;
+}
+
+.statLabel {
+    font-size: var(--text-sm);
+    color: var(--text-tertiary);
+    margin-top: var(--space-1);
+}
