@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, isValidElement, type ReactNode } from 'react';
+import { CodeBlock } from '../components/mdx/CodeBlock';
 
 import styles from './ApiDocPage.module.css';
 
@@ -10,6 +11,32 @@ export function ApiDocPage() {
     const [Component, setComponent] = useState<React.ComponentType | null>(null);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+
+    // Map MDX <pre><code> to our <CodeBlock>
+    const mdxComponents = {
+        pre: (props: { children?: ReactNode }) => {
+            const child = props.children;
+            if (isValidElement(child)) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const childProps = child.props as any;
+                if (childProps?.className) {
+                    const language = (childProps.className || '').replace('language-', '');
+                    const code = childProps.children;
+                    return <CodeBlock code={String(code).trim()} language={language} />;
+                }
+            }
+            return <pre {...props} />;
+        },
+        // Also ensure inline code looks correct
+        code: (props: { className?: string, children?: ReactNode }) => {
+            if (props.className) {
+                // Block code handled by pre above, this catches standalone code with lang
+                const language = props.className.replace('language-', '');
+                return <CodeBlock code={String(props.children).trim()} language={language} />;
+            }
+            return <code {...props} />;
+        }
+    };
 
     useEffect(() => {
         if (!slug) return;
@@ -67,12 +94,15 @@ export function ApiDocPage() {
         return <div style={{ padding: '2rem' }}>Loading API documentation...</div>;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const MDXContent = Component as any;
+
     return (
         <div className={styles.pageWrapper}>
             <div className={styles.contentArea}>
                 <main className={styles.markdown}>
                     <Suspense fallback={<div>Loading content...</div>}>
-                        <Component />
+                        <MDXContent components={mdxComponents} />
                     </Suspense>
                 </main>
             </div>

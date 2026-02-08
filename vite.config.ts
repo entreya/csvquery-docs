@@ -4,7 +4,6 @@ import mdx from '@mdx-js/rollup'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
-import rehypePrism from 'rehype-prism-plus'
 import rehypeSlug from 'rehype-slug'
 
 export default defineConfig({
@@ -12,7 +11,7 @@ export default defineConfig({
   plugins: [
     mdx({
       remarkPlugins: [remarkGfm, remarkFrontmatter, remarkMdxFrontmatter],
-      rehypePlugins: [rehypeSlug, [rehypePrism, { showLineNumbers: true }]],
+      rehypePlugins: [rehypeSlug],
     }),
     react(),
   ],
