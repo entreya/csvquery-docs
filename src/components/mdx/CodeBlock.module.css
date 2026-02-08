@@ -6,7 +6,7 @@
     background-color: var(--bg-code);
     border: 1px solid var(--border-code);
     transition: background-color var(--transition-normal), border-color var(--transition-normal);
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 .header {
@@ -54,6 +54,7 @@
     overflow-x: auto;
     /* Hide scrollbar track for code blocks to avoid empty line */
     scrollbar-color: var(--scrollbar-thumb) transparent;
+    box-shadow: none !important;
 }
 
 .pre::-webkit-scrollbar {

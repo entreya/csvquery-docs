@@ -34,5 +34,5 @@
 /* Ensure prism code blocks look good */
 .markdown pre {
     margin: var(--space-6) 0;
-    box-shadow: var(--shadow-sm);
+    box-shadow: none !important;
 }
