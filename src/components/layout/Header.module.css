@@ -60,7 +60,6 @@
     display: flex;
     align-items: center;
     gap: var(--space-4);
-    /* Increased gap for better spacing */
     width: 100%;
     max-width: 800px;
     /* Constrain the centered group */
@@ -111,26 +110,46 @@
     .container {
         justify-content: space-between;
         /* Revert on mobile */
+        gap: var(--space-4);
+        /* Reduce gap on mobile */
+        padding: 0 var(--space-4);
+        /* Reduce padding */
     }
 
     .right {
         width: auto;
         flex: 1;
+        /* Allow right side to take remaining space */
         justify-content: flex-end;
     }
 
     .searchButton {
+        /* Mobile Search Fix: Allow it to stretch */
+        min-width: unset;
+        width: auto;
+        flex: 1;
+        /* Grow to fill space */
+        justify-content: space-between;
+        /* Text left, icon right (if needed) or match desktop */
+        padding: 0 var(--space-3);
         height: 36px;
-        min-width: auto;
-        padding: 0 var(--space-2);
-        width: 36px;
-        flex: 0 0 36px;
-        justify-content: center;
+        /* Slightly smaller height on mobile is fine, but width is key */
+        max-width: none;
+        /* Remove desktop max-width if it interferes, though flexible is fine */
     }
 
-    .searchText,
+    .searchText {
+        display: block;
+        /* Force show text */
+        font-size: var(--text-sm);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .kbd {
         display: none;
+        /* Hide shortcut hint on mobile */
     }
 }
 
@@ -161,11 +180,21 @@
     align-items: center;
     justify-content: center;
     width: 44px;
-    /* Bigger touch target */
+    /* Maintain bigger touch target */
     height: 44px;
     color: var(--text-secondary);
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    flex-shrink: 0;
+    /* Prevent shrinking when search grows */
+}
+
+@media (max-width: 768px) {
+    .iconButton {
+        width: 36px;
+        /* Match mobile height */
+        height: 36px;
+    }
 }
 
 .iconButton:hover {
