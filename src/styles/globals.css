@@ -6,6 +6,21 @@
 @import './tokens.css';
 @import './tokens.css';
 
+/* Progress Bar Override */
+#nprogress .bar {
+    background: var(--primary-500) !important;
+    height: 3px !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px var(--primary-500), 0 0 5px var(--primary-500) !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: var(--primary-500) !important;
+    border-left-color: var(--primary-500) !important;
+}
+
 /* CSS Reset */
 *,
 *::before,

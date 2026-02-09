@@ -125,8 +125,8 @@
     --border-accent: rgba(139, 92, 246, 0.4);
 
     /* Links */
-    --link-color: #58a6ff;
-    --link-hover: #1f6feb;
+    --link-color: var(--primary-500);
+    --link-hover: var(--primary-600);
 
     /* Inline Code */
     --bg-inline-code: rgba(110, 118, 129, 0.4);
@@ -172,8 +172,8 @@
     --border-accent: rgba(139, 92, 246, 0.4);
 
     /* Links */
-    --link-color: #0969da;
-    --link-hover: #1f2328;
+    --link-color: var(--primary-600);
+    --link-hover: var(--primary-700);
 
     /* Inline Code */
     --bg-inline-code: #eff1f3;
