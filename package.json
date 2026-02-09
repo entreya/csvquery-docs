@@ -13,8 +13,12 @@
     "postbuild": "cp dist/index.html dist/404.html"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@mdx-js/react": "^3.1.1",
     "@mdx-js/rollup": "^3.1.1",
+    "@mui/icons-material": "^7.3.7",
+    "@mui/material": "^7.3.7",
     "@types/nprogress": "^0.2.3",
     "flexsearch": "^0.8.212",
     "framer-motion": "^12.33.0",

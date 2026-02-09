@@ -1,16 +1,26 @@
 import { createContext, useContext, useState, useCallback, type ReactNode, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { navigation } from '../../lib/navigation';
+import type { SvgIconComponent } from '@mui/icons-material';
 
-interface Tab {
-    path: string;
+// Define what a single segment in the breadcrumb looks like
+interface BreadcrumbItem {
     title: string;
+    path: string;
+    icon?: SvgIconComponent;
+}
+
+// The "Tab" now represents the entire active context chain
+export interface Tab {
+    path: string;
+    breadcrumbs: BreadcrumbItem[];
 }
 
 interface TabsContextType {
-    tabs: Tab[];
+    tabs: Tab[]; // Can contain multiple open tabs
     activeTabPath: string | null;
     openTab: (path: string, title?: string) => void;
+    navigateWithinTab: (fromTabPath: string, toPath: string) => void;
     closeTab: (path: string) => void;
     closeOtherTabs: (path: string) => void;
     closeAllTabs: () => void;
@@ -18,7 +28,6 @@ interface TabsContextType {
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
 
-// Helper to remove trailing slashes and basename
 const normalize = (path: string) => {
     let p = path;
     if (p.startsWith('/csvquery-docs')) p = p.replace('/csvquery-docs', '');
@@ -26,21 +35,29 @@ const normalize = (path: string) => {
     return p || '/';
 };
 
-// Helper to find hierarchical title from navigation
-// Returns "Parent > Child" string
-const findTitle = (path: string): string => {
+// Helper to find hierarchical chain
+const findTabChain = (path: string): BreadcrumbItem[] => {
     const normPath = normalize(path);
 
-    // Recursive search to find path to item
-    const search = (items: typeof navigation[0]['items'], currentPath: string[]): string[] | null => {
+    const search = (items: typeof navigation[0]['items'], currentChain: BreadcrumbItem[]): BreadcrumbItem[] | null => {
         for (const item of items) {
+            const itemTab: BreadcrumbItem = {
+                title: item.title,
+                path: item.href || '',
+                icon: item.icon
+            };
+
             // Check if this item matches
             if (item.href && normalize(item.href) === normPath) {
-                return [...currentPath, item.title];
+                return [...currentChain, itemTab];
             }
+
             // Check children
             if (item.items) {
-                const found = search(item.items, [...currentPath, item.title]);
+                // Always include parent in the chain for visual hierarchy (notch pattern)
+                // TabsBar will handle making them non-clickable if they don't have a path
+                const nextChain = [...currentChain, itemTab];
+                const found = search(item.items, nextChain);
                 if (found) return found;
             }
         }
@@ -48,20 +65,20 @@ const findTitle = (path: string): string => {
     };
 
     for (const section of navigation) {
-        // We can optionally include section title, but usually it's too high level (e.g. "API Reference")
         const found = search(section.items, []);
-        if (found) {
-            return found.join(' > ');
-        }
+        if (found) return found;
     }
 
-    // Fallback for known paths
-    if (normPath === '/' || normPath === '') return 'Introduction';
+    // Fallback logic for paths not in navigation
+    if (normPath === '/' || normPath === '') {
+        return [{ title: 'Introduction', path: '/', icon: undefined }];
+    }
 
-    // Fallback to capitalizing last segment
     const segments = normPath.split('/');
     const last = segments[segments.length - 1];
-    return last ? last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, ' ') : 'Page';
+    const title = last ? last.charAt(0).toUpperCase() + last.slice(1).replace(/-/g, ' ') : 'Page';
+
+    return [{ title, path, icon: undefined }];
 };
 
 export function TabsProvider({ children }: { children: ReactNode }) {
@@ -69,26 +86,43 @@ export function TabsProvider({ children }: { children: ReactNode }) {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Auto-open tab for current location
+    // Auto-open tab for current location (Multi-Tab Mode with Breadcrumbs)
     useEffect(() => {
         const path = normalize(location.pathname);
+        const chain = findTabChain(path);
+
         setTabs((prev) => {
-            // Update title if tab exists (in case hierarchy changed/navigation loaded)
+            // Check if this exact path already exists
             const existingIndex = prev.findIndex(t => normalize(t.path) === path);
-            const title = findTitle(path);
 
             if (existingIndex !== -1) {
-                // If title is different, update it
-                if (prev[existingIndex].title !== title) {
-                    const newTabs = [...prev];
-                    newTabs[existingIndex] = { ...newTabs[existingIndex], title };
-                    return newTabs;
-                }
-                return prev;
+                // Update existing tab's breadcrumbs if needed
+                const updated = [...prev];
+                updated[existingIndex] = { path: location.pathname, breadcrumbs: chain };
+                return updated;
             }
 
-            // Add new tab
-            return [...prev, { path: location.pathname, title }];
+            // Check for sibling navigation (same parent)
+            // A sibling shares the same parent breadcrumb chain (all but last item)
+            const parentChain = chain.slice(0, -1);
+
+            if (parentChain.length > 0) {
+                const siblingIndex = prev.findIndex(t => {
+                    const tabParentChain = t.breadcrumbs.slice(0, -1);
+                    if (tabParentChain.length !== parentChain.length) return false;
+                    return tabParentChain.every((item, i) => item.title === parentChain[i].title);
+                });
+
+                if (siblingIndex !== -1) {
+                    // Replace sibling tab with new path
+                    const updated = [...prev];
+                    updated[siblingIndex] = { path: location.pathname, breadcrumbs: chain };
+                    return updated;
+                }
+            }
+
+            // No existing or sibling tab - add new tab
+            return [...prev, { path: location.pathname, breadcrumbs: chain }];
         });
     }, [location.pathname]);
 
@@ -99,28 +133,39 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         navigate(path);
     }, [navigate]);
 
-    const closeTab = useCallback((path: string) => {
+    // Navigate within the same tab (for breadcrumb clicks)
+    // This replaces the current tab's path instead of adding a new tab
+    const navigateWithinTab = useCallback((fromTabPath: string, toPath: string) => {
         setTabs(prev => {
-            const newTabs = prev.filter(t => t.path !== path);
+            const tabIndex = prev.findIndex(t => t.path === fromTabPath);
+            if (tabIndex !== -1) {
+                // Remove the current tab, the useEffect will add the new one
+                const updated = [...prev];
+                updated.splice(tabIndex, 1);
+                return updated;
+            }
+            return prev;
+        });
+        navigate(toPath);
+    }, [navigate]);
+
+    const closeTab = useCallback((pathToClose: string) => {
+        setTabs(prev => {
+            const newTabs = prev.filter(t => t.path !== pathToClose);
 
             // If we closed the active tab, navigate to the last remaining tab, or home
-            if (path === location.pathname) {
+            if (pathToClose === location.pathname) {
                 if (newTabs.length > 0) {
                     navigate(newTabs[newTabs.length - 1].path);
                 } else {
-                    navigate('/'); // Navigate to home if all tabs closed
+                    navigate('/');
                 }
             }
             return newTabs;
         });
     }, [location.pathname, navigate]);
 
-    const closeOtherTabs = useCallback((path: string) => {
-        setTabs(prev => prev.filter(t => t.path === path));
-        if (path !== location.pathname) {
-            navigate(path);
-        }
-    }, [location.pathname, navigate]);
+    const closeOtherTabs = useCallback(() => { }, []); // No-op
 
     const closeAllTabs = useCallback(() => {
         setTabs([]);
@@ -132,6 +177,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
             tabs,
             activeTabPath: location.pathname,
             openTab,
+            navigateWithinTab,
             closeTab,
             closeOtherTabs,
             closeAllTabs

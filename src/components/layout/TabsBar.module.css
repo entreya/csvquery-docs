@@ -2,61 +2,102 @@
     width: 100%;
     border-bottom: 1px solid var(--border-primary);
     background-color: var(--bg-primary);
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    height: 40px;
 }
 
 .scrollArea {
     display: flex;
     overflow-x: auto;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* IE/Edge */
-    padding: 0 var(--space-4);
-    gap: var(--space-2);
-    height: 40px;
+    padding: 0;
+    gap: 0;
+    height: 100%;
     align-items: flex-end;
-    /* Align tabs to bottom line */
+    flex: 1;
+    scroll-behavior: smooth;
 }
 
 .scrollArea::-webkit-scrollbar {
     display: none;
 }
 
+/* Scroll buttons - full height, no margin/padding */
+.scrollBtn {
+    flex-shrink: 0;
+    align-self: stretch;
+    height: 100%;
+    width: 36px;
+    padding: 0;
+    margin: 0;
+    border-radius: 0;
+    background-color: var(--bg-paper);
+    border: none;
+    border-left: 1px solid var(--border-primary);
+    border-right: 1px solid var(--border-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    z-index: 2;
+}
+
+.scrollBtn:first-child {
+    border-left: none;
+    border-right: 1px solid var(--border-primary);
+}
+
+.scrollBtn:last-child {
+    border-right: none;
+    border-left: 1px solid var(--border-primary);
+}
+
+.scrollBtn:hover {
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Base tab styling - NO notch by default (flat) */
 .tab {
     display: flex;
     align-items: center;
     height: 32px;
     padding: 0 var(--space-3);
-    background-color: transparent;
-    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-    border: 1px solid transparent;
-    border-bottom: none;
+    background-color: var(--bg-secondary);
+    border: none;
     font-size: var(--text-sm);
     color: var(--text-secondary);
     cursor: pointer;
     white-space: nowrap;
     transition: all var(--transition-fast);
-    /* Make it look like a tab */
-    margin-bottom: -1px;
-    /* Overlap border */
+    margin-bottom: 0;
+    user-select: none;
+    position: relative;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    /* Default: no clip-path, no notches */
 }
 
 .tab:hover {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-hover);
     color: var(--text-primary);
 }
 
 .tab.active {
     background-color: var(--bg-primary);
-    border-color: var(--border-primary);
-    border-bottom-color: var(--bg-primary);
-    /* Blend with container border */
     color: var(--primary-500);
     font-weight: 500;
+    z-index: 1;
+    border: 1px solid var(--border-primary);
+    border-bottom: 1px solid var(--bg-primary);
 }
 
 .title {
-    margin-right: var(--space-2);
+    margin-right: var(--space-1);
 }
 
 .closeBtn {
@@ -67,6 +108,7 @@
     align-items: center;
     justify-content: center;
     opacity: 0.7;
+    margin-left: var(--space-1);
 }
 
 .closeBtn:hover {
@@ -81,4 +123,68 @@
 
 .tab.active .closeBtn:hover {
     color: var(--text-error);
+}
+
+/* Tab groups - each tab's breadcrumb chain */
+.tabGroup {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    margin-left: var(--space-2);
+}
+
+.tabGroup:first-child {
+    margin-left: var(--space-3);
+}
+
+/* Separator between tab groups */
+.separator {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border-primary);
+    margin: 0 var(--space-1);
+    align-self: center;
+    opacity: 0.5;
+}
+
+/* Breadcrumb crumbs (non-leaf) - these get the notch styling */
+/* Parent crumbs are non-clickable visual hierarchy indicators */
+.tab.crumb {
+    background-color: var(--bg-tertiary);
+    opacity: 0.85;
+    padding-right: 12px;
+    border-radius: 0;
+    cursor: default;
+    pointer-events: none;
+
+    /* Notch joint styling - arrow shape */
+    clip-path: polygon(0 0,
+            calc(100% - 8px) 0,
+            100% 50%,
+            calc(100% - 8px) 100%,
+            0 100%,
+            8px 50%);
+    margin-left: -8px;
+}
+
+/* First crumb - no left notch */
+.tabGroup>.tab.crumb:first-child {
+    clip-path: polygon(0 0,
+            calc(100% - 8px) 0,
+            100% 50%,
+            calc(100% - 8px) 100%,
+            0 100%);
+    margin-left: 0;
+    border-radius: var(--radius-sm) 0 0 0;
+}
+
+/* Leaf tab (non-crumb) that follows a crumb - needs left notch to connect */
+.tab.crumb+.tab:not(.crumb) {
+    border-radius: 0 var(--radius-sm) 0 0;
+    margin-left: -8px;
+    clip-path: polygon(0 0,
+            100% 0,
+            100% 100%,
+            0 100%,
+            8px 50%);
 }

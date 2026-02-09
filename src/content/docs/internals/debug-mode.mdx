@@ -1,0 +1,167 @@
+---
+title: Debug Mode
+description: Debugging and profiling CsvQuery operations.
+---
+
+# Debug Mode
+
+CsvQuery provides multiple debugging tools across PHP and Go layers.
+
+## PHP Debug Flag
+
+Enable command logging in GoBridge:
+
+```php
+$bridge = new GoBridge();
+$bridge->debug = true;
+
+$bridge->query('/data.csv', '/indexes', ['email' => 'john@example.com']);
+```
+
+**Output:**
+```
+[DEBUG] Executing: /path/bin/csvquery_darwin_amd64 query --csv /data.csv --index-dir /indexes --where {"email":"john@example.com"}
+```
+
+## Go Verbose Mode
+
+Enable real-time progress during indexing:
+
+```bash
+csvquery index --input data.csv --output ./indexes --columns '["email"]' --verbose
+```
+
+**Output:**
+```
+╭──────────────────────────────────────────────────────╮
+│                  csvquery v1.0.0                     │
+╰──────────────────────────────────────────────────────╯
+[Scanning] Rows: 5000000 | Rate: 450000/s | Elapsed: 11s | ETA: 11s
+[Sorting]  email: 5000000 records | Spills: 3
+[Writing]  email.cidx: 524 MB | Bloom: 6.2 MB
+```
+
+## Stderr Profiling
+
+Access timing information from Go stderr:
+
+```php
+$result = $bridge->query(...);
+$timing = $bridge->getLastStderr();
+
+echo $timing;
+// [Query] Bloom check: 0.01ms
+// [Query] Binary search: 0.12ms
+// [Query] Block reads: 3
+// [Query] Total: 2.34ms
+```
+
+## Explain Query Plans
+
+Get execution plan without running the query:
+
+```php
+$plan = $query->explain();
+```
+
+**Output:**
+```json
+{
+  "index": "email",
+  "type": "IndexScan",
+  "covered_columns": ["email"],
+  "searchKey": "john@example.com",
+  "blocks_scanned": 5,
+  "estimated_rows": 850,
+  "bloom_check": "passed"
+}
+```
+
+### Plan Types
+
+| Type | Description |
+|------|-------------|
+| `IndexScan` | Using index with optional post-filter |
+| `FullScan` | No usable index, scanning entire CSV |
+| `BloomReject` | Bloom filter proved key absent |
+
+## Socket Debug
+
+Enable SocketClient logging:
+
+```php
+$client = SocketClient::getInstance($binary, $indexDir);
+$client->debug = true;
+
+$client->count('/data.csv', ['status' => 'active']);
+```
+
+**Output:**
+```
+[SocketClient] Request: {"action":"count","csv":"/data.csv","where":{"status":"active"}}
+[SocketClient] Response: {"count":1500,"error":null}
+```
+
+## Index Metadata
+
+Inspect index information:
+
+```json
+// data_meta.json
+{
+  "capturedAt": "2026-02-07T12:00:00Z",
+  "totalRows": 10000000,
+  "csvSize": 1073741824,
+  "csvMtime": 1738922400,
+  "csvHash": "a1b2c3d4e5f6...",
+  "indexes": {
+    "email": {
+      "distinctCount": 9500000,
+      "fileSize": 524288000
+    }
+  }
+}
+```
+
+## Common Issues
+
+### Index Not Found
+
+```
+Error: no index found for columns: status
+```
+
+**Fix:** Create index for the column:
+```php
+$cq->createIndex(['status']);
+```
+
+### Index Stale
+
+```
+Warning: Index fingerprint mismatch, using FullScan
+```
+
+**Cause:** CSV modified since indexing.
+
+**Fix:** Rebuild index:
+```php
+$cq->createIndex(['email'], force: true);
+```
+
+### Connection Refused
+
+```
+Error: Failed to connect to socket /tmp/csvquery.sock
+```
+
+**Fix:** Start daemon or check permissions:
+```bash
+csvquery daemon --socket /tmp/csvquery.sock
+```
+
+## Related Documentation
+
+- [GoBridge](../api-reference/php/gobridge) - PHP debug flag
+- [Daemon](../api-reference/go/daemon) - Socket debugging
+- [Query Engine](../api-reference/go/query-engine) - Explain plans

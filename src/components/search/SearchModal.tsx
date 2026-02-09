@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { navigation } from '../../lib/navigation';
 import styles from './SearchModal.module.css';
+import ArticleIcon from '@mui/icons-material/Article';
+import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
+import type { SvgIconComponent } from '@mui/icons-material';
 
 interface SearchModalProps {
     onClose: () => void;
@@ -11,6 +14,8 @@ interface SearchResult {
     title: string;
     href: string;
     section: string;
+    path: { title: string; href?: string }[];
+    icon?: SvgIconComponent;
 }
 
 export function SearchModal({ onClose }: SearchModalProps) {
@@ -24,23 +29,25 @@ export function SearchModal({ onClose }: SearchModalProps) {
     const searchItems: SearchResult[] = useMemo(() => {
         const items: SearchResult[] = [];
 
-        function recurse(navItems: import('../../lib/navigation').NavItem[], sectionName: string) {
+        function recurse(navItems: import('../../lib/navigation').NavItem[], parentPath: { title: string; href?: string }[]) {
             for (const item of navItems) {
                 if (item.href) {
                     items.push({
                         title: item.title,
                         href: item.href,
-                        section: sectionName,
+                        section: parentPath[0]?.title || 'Uncategorized',
+                        path: parentPath,
+                        icon: item.icon,
                     });
                 }
                 if (item.items) {
-                    recurse(item.items, sectionName);
+                    recurse(item.items, [...parentPath, { title: item.title, href: item.href }]);
                 }
             }
         }
 
         navigation.forEach(section => {
-            recurse(section.items, section.title);
+            recurse(section.items, [{ title: section.title }]);
         });
 
         return items;
@@ -63,7 +70,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
         setSelectedIndex(0);
     }, [query, searchItems]);
 
-    // Group results by section for Tree View
+    // Group results by section
     const groupedResults = useMemo(() => {
         const groups: Record<string, SearchResult[]> = {};
         results.forEach(result => {
@@ -107,7 +114,6 @@ export function SearchModal({ onClose }: SearchModalProps) {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, [handleKeyDown]);
 
-    // Focus input on mount
     useEffect(() => {
         inputRef.current?.focus();
     }, []);
@@ -117,7 +123,6 @@ export function SearchModal({ onClose }: SearchModalProps) {
         onClose();
     };
 
-    // Helper to render the tree of results
     const renderResults = () => {
         let globalIndex = 0;
         return Object.entries(groupedResults).map(([section, items]) => (
@@ -127,16 +132,49 @@ export function SearchModal({ onClose }: SearchModalProps) {
                     {items.map(result => {
                         const currentIndex = globalIndex++;
                         const isSelected = currentIndex === selectedIndex;
+
+                        // Build tree items: path segments + final result
+                        const treeItems = [
+                            ...result.path.slice(1), // Skip section (already shown as header)
+                            { title: result.title, href: result.href, icon: result.icon }
+                        ];
+
                         return (
                             <li key={result.href}>
-                                <button
+                                <div
                                     className={`${styles.result} ${isSelected ? styles.selected : ''}`}
-                                    onClick={() => handleResultClick(result.href)}
                                     onMouseEnter={() => setSelectedIndex(currentIndex)}
                                 >
-                                    <span className={styles.resultTitle}>{result.title}</span>
-                                    {isSelected && <span className={styles.resultEnter}>&crarr;</span>}
-                                </button>
+                                    <div className={styles.treeView}>
+                                        {treeItems.map((item, depth) => {
+                                            const isLast = depth === treeItems.length - 1;
+                                            const ItemIcon = (item as any).icon || ArticleIcon;
+
+                                            return (
+                                                <div
+                                                    key={depth}
+                                                    className={styles.treeLine}
+                                                    style={{ paddingLeft: depth * 16 }}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (item.href) {
+                                                            handleResultClick(item.href);
+                                                        }
+                                                    }}
+                                                >
+                                                    <span className={styles.treeConnector}>
+                                                        {depth > 0 ? (isLast ? '└─' : '├─') : ''}
+                                                    </span>
+                                                    {depth === 0 && !isLast && <AccountTreeTwoToneIcon sx={{ fontSize: 14, mr: 0.5, opacity: 0.6 }} />}
+                                                    {isLast && <ItemIcon sx={{ fontSize: 16, mr: 0.75, color: 'primary.main' }} />}
+                                                    <span className={`${styles.treeLabel} ${isLast ? styles.treeLabelMain : ''} ${item.href ? styles.treeClickable : ''}`}>
+                                                        {item.title}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </li>
                         );
                     })}
@@ -144,6 +182,7 @@ export function SearchModal({ onClose }: SearchModalProps) {
             </div>
         ));
     };
+
 
     return (
         <div className={styles.overlay} onClick={onClose}>

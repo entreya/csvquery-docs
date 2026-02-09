@@ -1,0 +1,159 @@
+---
+title: Data Flow
+description: How data transforms through CsvQuery's indexing and query pipelines.
+---
+
+# Data Flow
+
+Understanding how data moves through CsvQuery helps optimize performance and debug issues.
+
+## Indexing Data Flow
+
+```mermaid
+flowchart LR
+    subgraph Input
+        CSV[CSV File<br/>1GB]
+    end
+    
+    subgraph Scanning
+        MMAP[mmap] --> Chunks[4 Chunks]
+        Chunks --> W1[Worker 1]
+        Chunks --> W2[Worker 2]
+        Chunks --> W3[Worker 3]
+        Chunks --> W4[Worker 4]
+    end
+    
+    subgraph SIMD
+        W1 --> B1[Bitmap Gen]
+        W2 --> B2[Bitmap Gen]
+        W3 --> B3[Bitmap Gen]
+        W4 --> B4[Bitmap Gen]
+    end
+    
+    subgraph Records
+        B1 --> R[IndexRecord<br/>80 bytes each]
+        B2 --> R
+        B3 --> R
+        B4 --> R
+    end
+    
+    subgraph Sorting
+        R --> Ch[Batched Channel]
+        Ch --> S[Sorter]
+        S --> Spill[Spill Files]
+        Spill --> Merge[K-Way Merge]
+    end
+    
+    subgraph Output
+        Merge --> CIDX[.cidx<br/>LZ4 Blocks]
+        Merge --> BL[.bloom<br/>Filter]
+    end
+    
+    CSV --> MMAP
+```
+
+### Stage Details
+
+| Stage | Throughput | Memory | Description |
+|-------|------------|--------|-------------|
+| mmap | N/A | ~0 | Zero-copy file access |
+| SIMD Parse | ~10 GB/s | O(1) | Bitmap generation |
+| Batching | N/A | 1000 × 80B | Channel overhead reduction |
+| Sort/Spill | ~500 MB/s | Configurable | External sort |
+| LZ4 Compress | ~1 GB/s | 64 KB buffer | Block compression |
+| Bloom Insert | O(n) | ~10 bits/key | Filter construction |
+
+## Query Data Flow
+
+```mermaid
+flowchart TB
+    subgraph Request
+        PHP[PHP Query] --> GB[GoBridge]
+        GB --> SC[SocketClient]
+    end
+    
+    subgraph Daemon
+        SC -->|JSON| D[Daemon]
+        D --> QE[Query Engine]
+    end
+    
+    subgraph Planning
+        QE --> Idx{Find Index}
+        Idx --> Bloom{Bloom Check}
+        Bloom -->|Not Found| Zero[Return 0]
+    end
+    
+    subgraph Execution
+        Bloom -->|Maybe| BS[Binary Search<br/>Sparse Index]
+        BS --> Block[Read Block]
+        Block --> LZ4[LZ4 Decompress]
+        LZ4 --> Cmp[Key Compare]
+    end
+    
+    subgraph Filtering
+        Cmp --> PF{Post-Filter}
+        PF -->|Pass| Out[Stream Result]
+        PF -->|Fail| Block
+    end
+    
+    subgraph Response
+        Out --> JSON[JSON Response]
+        JSON --> PHP2[PHP Result]
+    end
+```
+
+### Query Path Timing
+
+| Step | Typical Time | Notes |
+|------|--------------|-------|
+| Socket send | 0.1 ms | JSON request |
+| Bloom check | 0.01 ms | Memory-mapped |
+| Binary search | 0.1 ms | Log(N) blocks |
+| Block decompress | 1-5 ms | LZ4 is fast |
+| Key compare | O(matches) | Per-record |
+| Result stream | 0.1 ms | JSON response |
+
+## Index vs Full Scan
+
+```mermaid
+flowchart TB
+    Q[Query] --> Has{Has Index?}
+    
+    Has -->|Yes| Index[Index Scan]
+    Has -->|No| Full[Full Scan]
+    
+    Index --> Bloom[Bloom Filter]
+    Bloom -->|Not Found| R1[0 results<br/>0.1 ms]
+    Bloom -->|Maybe| Blocks[Scan Blocks<br/>1-10 ms]
+    
+    Full --> SIMD[SIMD Parse<br/>100ms-10s]
+    SIMD --> Filter[Row Filter]
+    
+    Blocks --> Results[Results]
+    Filter --> Results
+```
+
+## Update Data Flow
+
+Updates are stored in a sidecar file and applied at read time:
+
+```mermaid
+flowchart LR
+    subgraph Write
+        U[Update Request] --> JSON[_updates.json]
+    end
+    
+    subgraph Read
+        Q[Query] --> Load[Load Updates]
+        Load --> Apply[Apply to Result]
+        Apply --> R[Final Row]
+    end
+    
+    JSON -.-> Load
+```
+
+## Related Documentation
+
+- [Architecture Overview](./architecture-overview) - System components
+- [SIMD](../api-reference/go/simd) - Bitmap generation
+- [CIDX Format](../api-reference/go/cidx-format) - Index structure

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { Box, Container, useTheme, useMediaQuery } from '@mui/material';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
@@ -8,14 +9,19 @@ import { DocsPager } from './DocsPager';
 import { TabsBar } from './TabsBar';
 import { Breadcrumbs } from './Breadcrumbs';
 import { SearchModal } from '../search/SearchModal';
-import styles from './Layout.module.css';
-
 import { ProgressBar } from '../ui/ProgressBar';
 
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
     const location = useLocation();
+    const theme = useTheme();
+
+    // Match custom breakpoints from CSS
+    // sidebar hidden at max-width 1024px
+    const isSidebarPersistent = useMediaQuery('(min-width:1025px)');
+    // toc hidden at max-width 1280px
+    const showTocColumn = useMediaQuery('(min-width:1281px)');
 
     const handleMenuToggle = useCallback(() => {
         setSidebarOpen(prev => !prev);
@@ -38,23 +44,60 @@ export function Layout() {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Determine if we should show TOC
-    const showToc = !['/', '/getting-started', '/getting-started/'].includes(location.pathname);
+    // Determine if we should show TOC content (logic from original file)
+    // Note: showToc boolean controls rendering of the component, 
+    // showTocColumn controls visibility of the column layout
+    const shouldRenderToc = !['/', '/getting-started', '/getting-started/'].includes(location.pathname);
 
     return (
-        <div className={styles.layout}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '100vh',
+                bgcolor: 'background.default',
+                color: 'text.primary',
+            }}
+        >
             <ProgressBar />
-            <a href="#main-content" className="skip-link">
+            <Box
+                component="a"
+                href="#main-content"
+                className="skip-link"
+                sx={{
+                    position: 'absolute',
+                    top: '-100%',
+                    left: 2, // space-4
+                    zIndex: 9999,
+                    p: '0.75rem 1.5rem', // space-3 space-6
+                    bgcolor: 'primary.main',
+                    color: 'common.white',
+                    fontWeight: 600,
+                    borderRadius: 1, // radius-md
+                    textDecoration: 'none',
+                    transition: 'top 150ms ease',
+                    '&:focus': {
+                        top: 2, // space-4
+                        outline: '3px solid',
+                        outlineColor: 'primary.light',
+                        outlineOffset: '2px',
+                    }
+                }}
+            >
                 Skip to main content
-            </a>
+            </Box>
 
             <Header onMenuToggle={handleMenuToggle} onSearchOpen={handleSearchOpen} />
 
-            <div className={styles.wrapper}>
-                {/* Fixed Sidebar Space */}
-                <div
-                    className={styles.sidebarSpace}
+            <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>
+                {/* Fixed Sidebar Space - placeholder for fixed position sidebar */}
+                <Box
                     aria-hidden="true"
+                    sx={{
+                        flexShrink: 0,
+                        width: 280, // var(--sidebar-width)
+                        display: isSidebarPersistent ? 'block' : 'none',
+                    }}
                 />
 
                 <Sidebar
@@ -63,33 +106,57 @@ export function Layout() {
                 />
 
                 {/* Content Column: TabsBar + (Main + TOC) */}
-                <div className={styles.contentColumn}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
                     <TabsBar />
 
-                    <div className={styles.contentRow}>
-                        <main id="main-content" className={styles.main} role="main" tabIndex={-1}>
-                            <article className={styles.article}>
+                    <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>
+                        <Box
+                            component="main"
+                            id="main-content"
+                            role="main"
+                            tabIndex={-1}
+                            sx={{ flex: 1, minWidth: 0, p: 0, outline: 'none' }}
+                        >
+                            <Container
+                                disableGutters
+                                sx={{
+                                    maxWidth: '780px !important', // var(--content-max-width) force override
+                                    mx: 'auto',
+                                    p: 4, // space-8 (2rem)
+                                    [theme.breakpoints.down('sm')]: {
+                                        px: 2, // space-4
+                                        py: 3, // space-6
+                                    }
+                                }}
+                            >
                                 <Breadcrumbs />
                                 <Outlet />
                                 <DocsPager />
-                            </article>
-                        </main>
+                            </Container>
+                        </Box>
 
-                        {/* Table of Contents - Conditionally rendered or just hidden via CSS if empty, 
-                            but structurally adjacent to main now */}
-                        {showToc && (
-                            <aside className={styles.tocSpace} aria-label="Table of contents">
+                        {/* Table of Contents Column */}
+                        {shouldRenderToc && (
+                            <Box
+                                component="aside"
+                                aria-label="Table of contents"
+                                sx={{
+                                    flexShrink: 0,
+                                    width: 220, // var(--toc-width)
+                                    display: showTocColumn ? 'block' : 'none',
+                                }}
+                            >
                                 <TableOfContents />
-                            </aside>
+                            </Box>
                         )}
-                    </div>
+                    </Box>
 
-                    {/* Footer inside content column now, at bottom */}
+                    {/* Footer inside content column */}
                     <Footer />
-                </div>
-            </div>
+                </Box>
+            </Box>
 
             {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
-        </div>
+        </Box>
     );
 }

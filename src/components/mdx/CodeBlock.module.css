@@ -1,12 +1,18 @@
-/* CodeBlock - Entreya Theme with Dynamic Syntax Highlighting */
+/* CodeBlock - GitHub-like Theme */
 .container {
-    margin: var(--space-4) 0;
+    margin: 0;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    background-color: var(--bg-code);
-    /* border: 1px solid var(--border-code);*/
+    background-color: #f6f8fa;
+    /* GitHub Light Bg */
+    border: 1px solid #d0d7de;
     transition: background-color var(--transition-normal), border-color var(--transition-normal);
-    box-shadow: none !important;
+}
+
+:global([data-theme="dark"]) .container {
+    background-color: #161b22;
+    /* GitHub Dark Bg */
+    border-color: #30363d;
 }
 
 .header {
@@ -14,22 +20,25 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-2) var(--space-4);
-    background-color: rgba(0, 0, 0, 0.03);
-    /* Subtle tint instead of pure dark */
-    /* border-bottom: 1px solid var(--border-code); */
+    background-color: rgba(255, 255, 255, 0.5);
+    /* Transparent-ish */
+    border-bottom: 1px solid #d0d7de;
 }
 
-/* In Dark mode, make header slightly lighter than bg */
 :global([data-theme="dark"]) .header {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom-color: #30363d;
 }
 
 .language {
     font-size: var(--text-xs);
-    font-weight: 500;
-    color: var(--text-code-header);
+    font-weight: 600;
+    color: #57606a;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+}
+
+:global([data-theme="dark"]) .language {
+    color: #8b949e;
 }
 
 .copyButton {
@@ -38,114 +47,146 @@
     gap: var(--space-1);
     padding: var(--space-1) var(--space-2);
     font-size: var(--text-xs);
-    color: var(--text-muted);
+    color: #57606a;
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+:global([data-theme="dark"]) .copyButton {
+    color: #8b949e;
 }
 
 .copyButton:hover {
-    color: var(--text-code);
-    background-color: var(--bg-hover);
+    color: #24292f;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="dark"]) .copyButton:hover {
+    color: #c9d1d9;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .pre {
     margin: 0;
     padding: var(--space-4);
     overflow-x: auto;
-    /* Hide scrollbar track for code blocks to avoid empty line */
-    scrollbar-color: var(--scrollbar-thumb) transparent;
-    box-shadow: none !important;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #24292f;
 }
 
-.pre::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
+:global([data-theme="dark"]) .pre {
+    color: #c9d1d9;
 }
 
-.pre::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.pre::-webkit-scrollbar-corner {
-    background: transparent;
-}
-
-.code {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.7;
-    color: var(--text-code);
-    white-space: pre;
-    /* Force no wrap */
-}
-
-/* Syntax Highlighting */
-
-/* Comments */
+/* Syntax Highlighting - GitHub Light */
 .code :global(.token.comment),
 .code :global(.token.prolog),
 .code :global(.token.doctype),
 .code :global(.token.cdata) {
-    color: var(--token-comment);
+    color: #6e7781;
     font-style: italic;
 }
 
-/* Punctuation */
-.code :global(.token.punctuation) {
-    color: var(--token-punctuation);
-}
-
-/* Keywords, Functions */
-.code :global(.token.keyword),
-.code :global(.token.atrule),
-.code :global(.token.attr-value),
-.code :global(.token.php),
-.code :global(.token.delimiter),
-.code :global(.token.package),
 .code :global(.token.namespace) {
-    color: var(--token-keyword);
+    opacity: .7;
 }
 
-.code :global(.token.function) {
-    color: var(--token-function);
-}
-
-.code :global(.token.class-name) {
-    color: var(--token-class);
-}
-
-/* Strings, Characters */
 .code :global(.token.string),
-.code :global(.token.char),
-.code :global(.token.builtin),
-.code :global(.token.inserted),
-.code :global(.token.selector),
-.code :global(.token.attr-name) {
-    color: var(--token-string);
+.code :global(.token.attr-value) {
+    color: #0a3069;
 }
 
-/* Numbers, Booleans, Tags */
-.code :global(.token.property),
-.code :global(.token.tag),
-.code :global(.token.boolean),
-.code :global(.token.number),
-.code :global(.token.constant),
-.code :global(.token.symbol),
-.code :global(.token.deleted) {
-    color: var(--token-number);
+.code :global(.token.punctuation),
+.code :global(.token.operator) {
+    color: #24292f;
 }
 
-/* Operators, URLs */
-.code :global(.token.operator),
 .code :global(.token.entity),
-.code :global(.token.url) {
-    color: var(--token-operator);
+.code :global(.token.url),
+.code :global(.token.symbol),
+.code :global(.token.number),
+.code :global(.token.boolean),
+.code :global(.token.variable),
+.code :global(.token.constant),
+.code :global(.token.property),
+.code :global(.token.regex),
+.code :global(.token.inserted) {
+    color: #0550ae;
 }
 
-/* Regex */
-.code :global(.token.regex),
-.code :global(.token.important),
-.code :global(.token.variable),
-.code :global(.token.parameter) {
-    color: var(--token-variable);
+.code :global(.token.atrule),
+.code :global(.token.keyword),
+.code :global(.token.attr-name),
+.code :global(.token.selector) {
+    color: #cf222e;
+}
+
+.code :global(.token.function),
+.code :global(.token.deleted),
+.code :global(.token.tag) {
+    color: #8250df;
+}
+
+.code :global(.token.function-variable) {
+    color: #6f42c1;
+}
+
+.code :global(.token.tag),
+.code :global(.token.selector),
+.code :global(.token.keyword) {
+    color: #cf222e;
+}
+
+
+/* Syntax Highlighting - GitHub Dark Overrides */
+:global([data-theme="dark"]) .code :global(.token.comment),
+:global([data-theme="dark"]) .code :global(.token.prolog),
+:global([data-theme="dark"]) .code :global(.token.doctype),
+:global([data-theme="dark"]) .code :global(.token.cdata) {
+    color: #8b949e;
+}
+
+:global([data-theme="dark"]) .code :global(.token.string),
+:global([data-theme="dark"]) .code :global(.token.attr-value) {
+    color: #a5d6ff;
+}
+
+:global([data-theme="dark"]) .code :global(.token.punctuation),
+:global([data-theme="dark"]) .code :global(.token.operator) {
+    color: #c9d1d9;
+}
+
+:global([data-theme="dark"]) .code :global(.token.entity),
+:global([data-theme="dark"]) .code :global(.token.url),
+:global([data-theme="dark"]) .code :global(.token.symbol),
+:global([data-theme="dark"]) .code :global(.token.number),
+:global([data-theme="dark"]) .code :global(.token.boolean),
+:global([data-theme="dark"]) .code :global(.token.variable),
+:global([data-theme="dark"]) .code :global(.token.constant),
+:global([data-theme="dark"]) .code :global(.token.property),
+:global([data-theme="dark"]) .code :global(.token.regex),
+:global([data-theme="dark"]) .code :global(.token.inserted) {
+    color: #79c0ff;
+}
+
+:global([data-theme="dark"]) .code :global(.token.atrule),
+:global([data-theme="dark"]) .code :global(.token.keyword),
+:global([data-theme="dark"]) .code :global(.token.attr-name),
+:global([data-theme="dark"]) .code :global(.token.selector) {
+    color: #ff7b72;
+}
+
+:global([data-theme="dark"]) .code :global(.token.function),
+:global([data-theme="dark"]) .code :global(.token.deleted),
+:global([data-theme="dark"]) .code :global(.token.tag) {
+    color: #d2a8ff;
+}
+
+:global([data-theme="dark"]) .code :global(.token.function-variable) {
+    color: #a5d6ff;
 }

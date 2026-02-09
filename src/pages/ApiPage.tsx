@@ -75,7 +75,7 @@ $results = $csv->find()
             <ul>
                 <li><Link to="/api/csvquery">CsvQuery Class</Link> - Initialization and index management</li>
                 <li><Link to="/api/activequery">ActiveQuery Class</Link> - Query building and execution</li>
-                <li><Link to="/api/conditions">Condition Syntax</Link> - WHERE clause formats</li>
+                <li><Link to="/api/php/conditions">Condition Syntax</Link> - WHERE clause formats</li>
             </ul>
         </>
     );

@@ -111,6 +111,7 @@
     --bg-tertiary: #161b22;
     /* Slate 700 */
     --bg-hover: rgba(139, 92, 246, 0.15);
+    --bg-paper: #161b22;
 
     /* Text colors */
     --text-primary: #c9d1d9;
@@ -158,6 +159,7 @@
     --bg-tertiary: #eaeef2;
     /* Gray 100 */
     --bg-hover: rgba(139, 92, 246, 0.1);
+    --bg-paper: #ffffff;
 
     /* Text colors */
     --text-primary: #24292f;

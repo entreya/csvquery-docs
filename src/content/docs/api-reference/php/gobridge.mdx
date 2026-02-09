@@ -1,13 +1,31 @@
 ---
 title: GoBridge
-description: PHP wrapper for the CsvQuery Go binary.
+description: PHP wrapper for the CsvQuery Go binary with socket-first execution.
 ---
 
 # GoBridge
 
 `Entreya\CsvQuery\Bridge\GoBridge`
 
-The `GoBridge` class handles the communication between PHP and the compiled Go binary. It manages process execution, data serialization, and result streaming.
+The `GoBridge` class handles communication between PHP and the Go binary. It uses a **socket-first strategy** for maximum performance, falling back to CLI execution when needed.
+
+## Execution Strategy
+
+```mermaid
+flowchart TB
+    A[Method Call] --> B{Socket Enabled?}
+    B -->|Yes| C[Try SocketClient]
+    C -->|Success| D[Return Result]
+    C -->|Fail| E[Fall back to CLI]
+    B -->|No| E
+    E --> F[proc_open Binary]
+    F --> G[Stream Output]
+    G --> H[Parse Response]
+    H --> D
+    
+    style C fill:#2d5a27
+    style E fill:#5a5a27
+```
 
 ## Constructor
 
@@ -15,35 +33,100 @@ The `GoBridge` class handles the communication between PHP and the compiled Go b
 public function __construct(array $options = [])
 ```
 
-**Parameters:**
-- `options` (array): Configuration options.
-    - `workers` (int): Number of workers (0 = auto).
-    - `memoryMB` (int): Memory per worker.
-    - `binaryPath` (string): Override binary path.
-    - `useSocket` (bool): Use Unix socket if available (default: `true`).
-    - `indexDir` (string): Index directory for socket client.
+**Options:**
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `workers` | int | 0 | Worker count (0 = auto) |
+| `memoryMB` | int | 500 | Memory limit per worker |
+| `binaryPath` | string | auto | Override binary path |
+| `useSocket` | bool | true | Use socket if available |
+| `indexDir` | string | '' | Index directory for socket |
+
+## Binary Detection
+
+Automatically detects the correct binary for the OS/architecture:
+
+```mermaid
+flowchart LR
+    A[Detect OS] --> B{PHP_OS_FAMILY}
+    B -->|Darwin| C[darwin]
+    B -->|Windows| D[windows]
+    B -->|*| E[linux]
+    
+    F[Detect Arch] --> G{php_uname 'm'}
+    G -->|arm64/aarch64| H[arm64]
+    G -->|*| I[amd64]
+    
+    C --> J["bin/csvquery_darwin_{arch}"]
+    D --> K["bin/csvquery_windows_{arch}.exe"]
+    E --> L["bin/csvquery_linux_{arch}"]
+```
+
+```php
+private function detectBinary(): string
+{
+    $binDir = dirname(__DIR__, 3) . '/bin';
+    
+    $os = match (PHP_OS_FAMILY) {
+        'Darwin' => 'darwin',
+        'Windows' => 'windows',
+        default => 'linux',
+    };
+    
+    $arch = match (php_uname('m')) {
+        'arm64', 'aarch64' => 'arm64',
+        default => 'amd64',
+    };
+    
+    return "{$binDir}/csvquery_{$os}_{$arch}" . ($os === 'windows' ? '.exe' : '');
+}
+```
 
 ## Methods
 
 ### createIndex()
 
 ```php
-public function createIndex(string $csvPath, string $outputDir, string $columnsJson, string $separator = ',', bool $verbose = false, array $options = []): bool
+public function createIndex(
+    string $csvPath,
+    string $outputDir,
+    string $columnsJson,
+    string $separator = ',',
+    bool $verbose = false,
+    array $options = []
+): bool
 ```
 
-Executes the `index` command on the Go binary.
+Creates indexes for CSV columns.
 
 ### query()
 
 ```php
-public function query(string $csvPath, string $indexDir, array $where, int $limit = 0, int $offset = 0, bool $explain = false, ?string $groupBy = null, ?string $aggCol = null, ?string $aggFunc = null): \Generator|array
+public function query(
+    string $csvPath,
+    string $indexDir,
+    array $where,
+    int $limit = 0,
+    int $offset = 0,
+    bool $explain = false,
+    ?string $groupBy = null,
+    ?string $aggCol = null,
+    ?string $aggFunc = null
+): \Generator|array
 ```
 
-Executes the `query` command on the Go binary (or via socket).
-
 **Returns:**
-- `\Generator`: Yields result rows (offsets) for standard queries.
-- `array`: Returns aggregation results or query plans for complex queries.
+- `Generator` for standard queries (yields `['offset' => int, 'line' => int]`)
+- `array` for aggregations, groupBy, or explain
+
+### count()
+
+```php
+public function count(string $csvPath, string $indexDir, array $where): int
+```
+
+Fast count - uses socket for sub-millisecond response.
 
 ### update()
 
@@ -51,7 +134,29 @@ Executes the `query` command on the Go binary (or via socket).
 public function update(string $csvPath, string $setClause, ?string $whereJson = null, string $indexDir = ''): int
 ```
 
-Executes the `update` command.
+Updates rows matching conditions. Returns updated row count.
+
+### alter()
+
+```php
+public function alter(
+    string $csvPath,
+    string $columnName,
+    string $defaultValue,
+    string $separator = ',',
+    bool $materialize = false
+): void
+```
+
+Adds a virtual column to the CSV schema.
+
+### write()
+
+```php
+public function write(string $csvPath, array $rows, array $headers = [], string $separator = ','): void
+```
+
+Appends rows to a CSV file.
 
 ### getVersion()
 
@@ -59,4 +164,55 @@ Executes the `update` command.
 public function getVersion(): string
 ```
 
-Returns the version string of the underlying Go binary.
+Returns the Go binary version string.
+
+## Process Execution
+
+Uses `proc_open` with non-blocking I/O:
+
+```php
+private function execute(array $args, bool $passthrough = false): bool
+{
+    $command = array_merge([$this->binaryPath], $args);
+    
+    $descriptors = [
+        0 => ['pipe', 'r'],  // stdin
+        1 => ['pipe', 'w'],  // stdout
+        2 => ['pipe', 'w'],  // stderr
+    ];
+    
+    $process = proc_open($command, $descriptors, $pipes);
+    
+    // Platform-specific I/O handling
+    if (PHP_OS_FAMILY === 'Windows') {
+        // Polling loop (stream_select not supported)
+    } else {
+        // stream_select for efficiency
+    }
+}
+```
+
+## Debug Mode
+
+Enable command logging:
+
+```php
+$bridge = new GoBridge();
+$bridge->debug = true;  // Prints executed commands
+
+$bridge->query(...);
+// [DEBUG] Executing: /path/bin/csvquery_darwin_amd64 query --csv ...
+```
+
+Access stderr for profiling:
+
+```php
+$result = $bridge->query(...);
+echo $bridge->getLastStderr();  // Timing info, debug messages
+```
+
+## Related Documentation
+
+- [SocketClient](./socketclient) - Underlying socket connection
+- [Daemon (Go)](../go/daemon) - Server that receives socket requests
+- [CsvQuery](./csvquery) - High-level API using GoBridge

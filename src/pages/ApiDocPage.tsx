@@ -4,7 +4,7 @@ import { CodeBlock } from '../components/mdx/CodeBlock';
 
 import styles from './ApiDocPage.module.css';
 
-export function ApiDocPage() {
+export function ApiDocPage({ section = 'api-reference' }: { section?: string }) {
     const params = useParams();
     const slug = params['*'];
 
@@ -12,6 +12,7 @@ export function ApiDocPage() {
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
+    // ... (mdxComponents logic remains same)
     // Map MDX <pre><code> to our <CodeBlock>
     const mdxComponents = {
         pre: (props: { children?: ReactNode }) => {
@@ -41,26 +42,30 @@ export function ApiDocPage() {
     useEffect(() => {
         if (!slug) return;
 
-        // Handle category redirects
-        if (slug === 'php') {
-            navigate('/api/php/csvquery', { replace: true });
-            return;
-        }
-        if (slug === 'go') {
-            navigate('/api/go/cli', { replace: true });
-            return;
+        // Handle category redirects (only for api-reference)
+        if (section === 'api-reference') {
+            if (slug === 'php') {
+                navigate('/api/php/csvquery', { replace: true });
+                return;
+            }
+            if (slug === 'go') {
+                navigate('/api/go/cli', { replace: true });
+                return;
+            }
         }
 
-        // Glob all API docs
-        const modules = import.meta.glob('../content/docs/api-reference/**/*.mdx');
+        // Glob all API docs and Internals
+        // Note: Vite glob imports must be literal strings. We can't use variables in glob().
+        // So we glob everything in docs/ and filter.
+        const modules = import.meta.glob('../content/docs/**/*.mdx');
 
-        // Try to match slug to file
-        const targetKey = `../content/docs/api-reference/${slug}.mdx`;
+        // Construct target key based on section
+        const targetKey = `../content/docs/${section}/${slug}.mdx`;
         const importer = modules[targetKey];
 
         if (!importer) {
-            console.error(`Doc not found for slug: ${slug} (Key: ${targetKey})`);
-            setError(`Documentation not found: ${slug}`);
+            console.error(`Doc not found for slug: ${slug} (Section: ${section}, Key: ${targetKey})`);
+            setError(`Documentation not found: ${section}/${slug}`);
             return;
         }
 

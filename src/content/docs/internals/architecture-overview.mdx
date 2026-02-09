@@ -1,0 +1,93 @@
+---
+title: Architecture Overview
+description: High-level system architecture of CsvQuery.
+---
+
+# Architecture Overview
+
+CsvQuery is a **multi-language system** combining a high-performance Go engine with a PHP SDK for seamless integration.
+
+## System Components
+
+```mermaid
+graph TB
+    subgraph "PHP Application"
+        App[User Application]
+    end
+    
+    subgraph "PHP SDK"
+        CQ[CsvQuery] --> QB[QueryBuilder]
+        CQ --> AQ[ActiveQuery]
+        QB --> GB[GoBridge]
+        AQ --> GB
+        GB --> SC[SocketClient]
+        GB --> CLI[proc_open CLI]
+    end
+    
+    subgraph "Go Engine"
+        Daemon[Daemon Server]
+        QE[Query Engine]
+        Idx[Indexer]
+        Scn[Scanner]
+    end
+    
+    subgraph "Storage"
+        CSV[(CSV File)]
+        CIDX[(CIDX Indexes)]
+        Bloom[(Bloom Filters)]
+        Meta[(Metadata JSON)]
+    end
+    
+    App --> CQ
+    SC <-->|Unix Socket| Daemon
+    CLI -->|Process| QE
+    Daemon --> QE
+    QE --> CIDX
+    QE --> Bloom
+    QE --> CSV
+    Idx --> Scn
+    Scn --> CSV
+    Idx --> CIDX
+    Idx --> Bloom
+    Idx --> Meta
+```
+
+## Communication Paths
+
+| Path | Protocol | Latency | Use Case |
+|------|----------|---------|----------|
+| Socket | Unix Domain Socket | ~1ms | Frequent queries |
+| CLI | Process spawn | ~50ms | Indexing, one-off |
+| TCP | TCP Socket | ~5ms | Cross-machine |
+
+## File Organization
+
+```
+project/
+├── data.csv                    # Source data
+├── indexes/                    # Index directory
+│   ├── data_email.cidx        # Compressed index
+│   ├── data_email.cidx.bloom  # Bloom filter
+│   ├── data_meta.json         # Metadata
+│   ├── data_schema.json       # Virtual columns
+│   └── data_updates.json      # Pending updates
+```
+
+## Component Responsibilities
+
+| Component | Language | Purpose |
+|-----------|----------|---------|
+| CsvQuery | PHP | High-level API |
+| QueryBuilder | PHP | Fluent query construction |
+| GoBridge | PHP | Binary execution |
+| SocketClient | PHP | Daemon communication |
+| Scanner | Go | SIMD CSV parsing |
+| Indexer | Go | Parallel index building |
+| Query Engine | Go | Index lookup + filtering |
+| Daemon | Go | Persistent server |
+
+## Related Documentation
+
+- [Data Flow](./data-flow) - Detailed data transformation paths
+- [CIDX Format](../api-reference/go/cidx-format) - Index file format
+- [Daemon](../api-reference/go/daemon) - Socket server

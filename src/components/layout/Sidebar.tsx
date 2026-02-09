@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useLocation, Link } from 'react-router-dom';
+import { NavLink, useLocation, Link as RouterLink } from 'react-router-dom';
+import { Box, List, ListItem, Collapse, Typography, Link, ButtonBase } from '@mui/material';
 import { navigation } from '../../lib/navigation';
-import styles from './Sidebar.module.css';
 
-interface SidebarProps {
+export interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-// Recursive Nav Item Component
-function SidebarItem({ item, onClose }: { item: import('../../lib/navigation').NavItem, onClose: () => void }) {
+// Fixed Sidebar Item to handle nesting props properly
+function NavItem({ item, onClose, level = 0 }: { item: import('../../lib/navigation').NavItem, onClose: () => void, level?: number }) {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
-    // Auto-expand if active child
+    // Auto-expand
     useEffect(() => {
         if (item.items) {
             const hasActiveChild = item.items.some(child =>
@@ -26,65 +26,166 @@ function SidebarItem({ item, onClose }: { item: import('../../lib/navigation').N
         }
     }, [location.pathname, item.items]);
 
+    const isNested = level > 0;
+    // Connector line style for nested items
+    const connectorStyle = isNested ? {
+        '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: '50%',
+            left: 0,
+            width: '12px', // Connector length
+            height: '1px',
+            bgcolor: 'divider', // Matches the vertical line
+            transform: 'translateY(-50%)',
+        }
+    } : {};
+
+    // Group Header (with children)
     if (item.items) {
         return (
-            <li className={styles.nestedGroup}>
-                <button
-                    className={styles.nestedHeader}
+            <ListItem disablePadding sx={{ display: 'block', mb: 0 }}>
+                <ButtonBase
                     onClick={() => setIsOpen(!isOpen)}
                     aria-expanded={isOpen}
+                    sx={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        py: 0.75,
+                        pr: 2,
+                        pl: isNested ? 3 : 3, // Fixed padding, indentation handled by parent List ml
+                        textAlign: 'left',
+                        color: 'text.secondary',
+                        fontSize: '0.875rem',
+                        transition: 'color 150ms ease',
+                        position: 'relative',
+                        '&:hover': { color: 'text.primary' },
+                        ...(isOpen && { color: 'primary.main' }),
+                        ...connectorStyle
+                    }}
                 >
-                    <span className={styles.nestedTitle}>{item.title}</span>
-                    <svg
-                        className={`${styles.chevron} ${isOpen ? styles.rotate : ''}`}
-                        width="14"
-                        height="14"
+                    {item.icon && (
+                        <item.icon
+                            sx={{
+                                fontSize: 20,
+                                mr: 1,
+                                color: 'inherit',
+                                opacity: 0.8
+                            }}
+                        />
+                    )}
+                    <Typography variant="body2" sx={{ fontWeight: 500, flex: 1 }}>{item.title}</Typography>
+                    <Box
+                        component="svg"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        sx={{
+                            width: 12,
+                            height: 12,
+                            strokeWidth: 1.5,
+                            transition: 'transform 250ms ease',
+                            transform: isOpen ? 'rotate(180deg)' : 'none',
+                            opacity: 0.7,
+                            flexShrink: 0,
+                            ml: 1,
+                        }}
                     >
                         <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                </button>
-                {isOpen && (
-                    <ul className={styles.nestedList}>
+                    </Box>
+                </ButtonBase>
+                <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                    <List
+                        disablePadding
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            ml: 3, // Indent the list for hierarchy
+                            borderLeft: '1px solid', // Vertical tree line
+                            borderColor: 'divider',
+                        }}
+                    >
                         {item.items.map(subItem => (
-                            <SidebarItem key={subItem.title} item={subItem} onClose={onClose} />
+                            <NavItem key={subItem.title} item={subItem} onClose={onClose} level={level + 1} />
                         ))}
-                    </ul>
-                )}
-            </li>
+                    </List>
+                </Collapse>
+            </ListItem>
         );
     }
 
     if (!item.href) return null;
 
+    // Link Item
     return (
-        <li>
-            <NavLink
+        <ListItem disablePadding sx={{ display: 'block', mb: 0 }}>
+            <Link
+                component={NavLink}
                 to={item.href}
-                end={true}
-                className={({ isActive }) =>
-                    `${styles.link} ${isActive ? styles.active : ''}`
-                }
+                end // Use specific matching to avoid parent links being active for child routes
                 onClick={() => {
                     if (window.innerWidth < 1024) {
                         onClose();
                     }
                 }}
+                underline="none"
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    py: 0.25, // Minimal vertical gutter
+                    pr: 2.5, // Restored horizontal gutter
+                    pl: 3.5, // Restored horizontal gutter (indented)
+                    fontSize: '0.85rem',
+                    color: 'text.secondary',
+                    transition: 'all 150ms ease',
+                    position: 'relative',
+                    textDecoration: 'none !important',
+                    borderRight: '2px solid transparent', // Keep active border on right? Or maybe remove for nested?
+
+                    ...connectorStyle,
+
+                    '&:hover': {
+                        color: 'text.primary',
+                        bgcolor: 'action.hover',
+                    },
+
+                    // Active state
+                    '&.active': {
+                        color: 'primary.main',
+                        bgcolor: 'rgba(139, 92, 246, 0.1)',
+                        fontWeight: 600,
+                        borderRightColor: 'primary.main',
+                        // Ensure connector is visible/colored?
+                        '&::before': {
+                            bgcolor: 'divider', // Keep it subtle or make it active color? 
+                            // Usually tree lines stay neutral.
+                        }
+                    }
+                }}
             >
-                {item.title}
-            </NavLink>
-        </li>
+                {item.icon && (
+                    <item.icon
+                        sx={{
+                            fontSize: 18,
+                            mr: 1.5,
+                            color: 'inherit',
+                            opacity: 0.8
+                        }}
+                    />
+                )}
+                <Box component="span" sx={{ flex: 1 }}>{item.title}</Box>
+            </Link>
+        </ListItem>
     );
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
     const [openSections, setOpenSections] = useState<string[]>(
-        navigation.map(n => n.title) // start all open
+        navigation.map(n => n.title)
     );
-
     const location = useLocation();
 
     // Auto-expand logic based on active route
@@ -93,7 +194,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             const hasActiveLink = section.items.some(item => {
                 if (item.href === location.pathname) return true;
                 if (item.items) {
-                    // Check children
                     return item.items.some(child => child.href === location.pathname || (child.items && child.items.some(g => g.href === location.pathname)));
                 }
                 return false;
@@ -116,68 +216,153 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     return (
         <>
             {/* Backdrop for mobile */}
-            {isOpen && (
-                <div
-                    className={styles.backdrop}
-                    onClick={onClose}
-                    aria-hidden="true"
-                />
-            )}
+            <Box
+                onClick={onClose}
+                aria-hidden="true"
+                sx={{
+                    position: 'fixed',
+                    inset: 0,
+                    bgcolor: 'rgba(0, 0, 0, 0.6)',
+                    zIndex: 40,
+                    backdropFilter: 'blur(4px)',
+                    display: isOpen ? 'block' : 'none',
+                    '@media (min-width: 1025px)': {
+                        display: 'none !important'
+                    }
+                }}
+            />
 
-            <aside
-                className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}
+            <Box
+                component="aside"
+                sx={{
+                    position: 'fixed',
+                    top: 64, // header-height
+                    left: 0,
+                    bottom: 0,
+                    width: 280, // sidebar-width
+                    bgcolor: 'background.default', // bg-primary (checked: muiTheme map)
+                    borderRight: 1,
+                    borderColor: 'divider',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    zIndex: 50,
+                    transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
+                    transition: 'transform 250ms ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    '@media (min-width: 1025px)': {
+                        transform: 'translateX(0) !important'
+                    }
+                }}
             >
                 {/* Branding Header */}
-                <div className={styles.branding}>
-                    <Link to="/" className={styles.brandingLink}>
-                        <img
+                <Box
+                    sx={{
+                        p: '0.5rem', // Reduced logo padding
+                        mb: 1,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                    }}
+                >
+                    <Link
+                        component={RouterLink}
+                        to="/"
+                        underline="none"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            color: 'text.primary',
+                            textDecoration: 'none !important',
+                        }}
+                    >
+                        <Box
+                            component="img"
                             src="/csvquery-docs/entreya-logo.png"
                             alt="entreya"
-                            className={styles.brandingLogo}
+                            sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 0.5,
+                            }}
                         />
-                        <div className={styles.brandingText}>
-                            <span className={styles.libName}>csvquery</span>
-                        </div>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+                            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: 'text.primary' }}>
+                                csvquery
+                            </Typography>
+                        </Box>
                     </Link>
-                </div>
+                </Box>
 
-                <nav className={styles.nav}>
+                <Box component="nav" sx={{ display: 'flex', flexDirection: 'column', flex: 1, pb: 8 }}>
                     {navigation.map((section) => {
                         const isSectionOpen = openSections.includes(section.title);
 
                         return (
-                            <div key={section.title} className={styles.section}>
-                                <button
-                                    className={styles.sectionHeader}
+                            <Box key={section.title} sx={{ display: 'flex', flexDirection: 'column', mb: 0 }}>
+                                <ButtonBase
                                     onClick={() => toggleSection(section.title)}
                                     aria-expanded={isSectionOpen}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        textAlign: 'left',
+                                        py: 0.5, // Reduced vertical
+                                        px: 2.5, // Restored horizontal gutter
+                                        color: 'text.secondary',
+                                        transition: 'color 150ms ease',
+                                        '&:hover': {
+                                            color: 'text.primary',
+                                        },
+                                        ...(isSectionOpen && {
+                                        })
+                                    }}
                                 >
-                                    <span className={styles.sectionTitle}>{section.title}</span>
-                                    <svg
-                                        className={`${styles.chevron} ${isSectionOpen ? styles.rotate : ''}`}
-                                        width="16"
-                                        height="16"
+                                    <Typography
+                                        variant="caption"
+                                        sx={{
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.05em',
+                                            color: 'inherit'
+                                        }}
+                                    >
+                                        {section.title}
+                                    </Typography>
+                                    <Box
+                                        component="svg"
                                         viewBox="0 0 24 24"
                                         fill="none"
                                         stroke="currentColor"
-                                        strokeWidth="2"
+                                        sx={{
+                                            width: 12,
+                                            height: 12,
+                                            strokeWidth: 1.5,
+                                            transition: 'transform 250ms ease',
+                                            transform: isSectionOpen ? 'rotate(180deg)' : 'none',
+                                            opacity: 0.7,
+                                            flexShrink: 0,
+                                            ml: 1,
+                                        }}
                                     >
                                         <polyline points="6 9 12 15 18 9" />
-                                    </svg>
-                                </button>
+                                    </Box>
+                                </ButtonBase>
 
-                                <div className={`${styles.sectionContent} ${isSectionOpen ? styles.show : ''}`}>
-                                    <ul className={styles.list}>
+                                <Collapse in={isSectionOpen} timeout="auto">
+                                    <List disablePadding sx={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                                         {section.items.map((item) => (
-                                            <SidebarItem key={item.title} item={item} onClose={onClose} />
+                                            <NavItem key={item.title} item={item} onClose={onClose} />
                                         ))}
-                                    </ul>
-                                </div>
-                            </div>
+                                    </List>
+                                </Collapse>
+                            </Box>
                         );
                     })}
-                </nav>
-            </aside>
+                </Box>
+            </Box>
         </>
     );
 }

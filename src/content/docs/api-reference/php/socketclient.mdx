@@ -1,13 +1,80 @@
 ---
 title: SocketClient
-description: Persistent Unix socket client for the Go daemon.
+description: Singleton socket client for fast daemon communication.
 ---
 
 # SocketClient
 
 `Entreya\CsvQuery\Bridge\SocketClient`
 
-The `SocketClient` provides a high-performance, persistent connection to the CsvQuery Go daemon via Unix Domain Sockets. It automatically handles daemon startup and connection management.
+The `SocketClient` provides a **persistent connection** to the Go daemon via Unix Domain Sockets. It eliminates the ~50ms overhead of spawning a new process per query.
+
+## Connection Lifecycle
+
+```mermaid
+flowchart TB
+    A[getInstance] --> B{Instance exists?}
+    B -->|Yes| C[Return existing]
+    B -->|No| D[Create new instance]
+    
+    D --> E{Socket file exists?}
+    E -->|No| F[DaemonManager.start]
+    E -->|Yes| G[Connect to socket]
+    F --> G
+    
+    G --> H[Set blocking mode]
+    H --> I[Return instance]
+    
+    C --> J[Check connection valid]
+    J -->|Invalid| K[Reconnect]
+    J -->|Valid| L[Return]
+    K --> G
+```
+
+## Singleton Pattern
+
+Single connection per PHP process:
+
+```php
+private static ?SocketClient $instance = null;
+
+public static function getInstance(string $binaryPath = '', string $indexDir = ''): self
+{
+    if (self::$instance === null) {
+        if ($binaryPath === '') {
+            throw new \RuntimeException('SocketClient requires binaryPath on first call');
+        }
+        self::$instance = new self($binaryPath, $indexDir);
+    }
+    return self::$instance;
+}
+```
+
+## Socket Path Resolution
+
+Priority order:
+
+1. **Environment variable**: `CSVQUERY_SOCKET`
+2. **Address file**: `/tmp/csvquery_daemon.addr`
+3. **Default**: `/tmp/csvquery.sock`
+
+```php
+if ($socketPath) {
+    $this->socketPath = $socketPath;
+} else {
+    $env = getenv('CSVQUERY_SOCKET');
+    if ($env) {
+        $this->socketPath = $env;
+    } else {
+        $addrFile = sys_get_temp_dir() . '/csvquery_daemon.addr';
+        if (file_exists($addrFile)) {
+            $this->socketPath = trim(file_get_contents($addrFile));
+        } else {
+            $this->socketPath = '/tmp/csvquery.sock';
+        }
+    }
+}
+```
 
 ## Methods
 
@@ -17,7 +84,15 @@ The `SocketClient` provides a high-performance, persistent connection to the Csv
 public static function getInstance(string $binaryPath = '', string $indexDir = ''): self
 ```
 
-Returns the singleton instance of the client.
+Returns the singleton instance. Creates if not exists.
+
+### configure()
+
+```php
+public static function configure(string $binaryPath, string $indexDir = '', string $socketPath = ''): void
+```
+
+Pre-configures the singleton (called by GoBridge).
 
 ### query()
 
@@ -25,11 +100,7 @@ Returns the singleton instance of the client.
 public function query(string $action, array $params = []): array
 ```
 
-Sends a raw query request to the daemon.
-
-**Parameters:**
-- `action` (string): Action to perform (`count`, `select`, `groupby`, `ping`, `status`).
-- `params` (array): Parameters for the action.
+Low-level query method. Sends JSON request, returns parsed response.
 
 ### count()
 
@@ -37,7 +108,7 @@ Sends a raw query request to the daemon.
 public function count(string $csvPath, array $where = []): int
 ```
 
-Sends a fast count request to the daemon.
+Fast count query.
 
 ### select()
 
@@ -45,7 +116,15 @@ Sends a fast count request to the daemon.
 public function select(string $csvPath, array $where = [], int $limit = 0, int $offset = 0): array
 ```
 
-Sends a select request to the daemon.
+Returns array of `['offset' => int, 'line' => int]`.
+
+### groupBy()
+
+```php
+public function groupBy(string $csvPath, string $column, string $aggFunc = 'count', array $where = []): array
+```
+
+Grouped aggregation.
 
 ### ping()
 
@@ -53,4 +132,91 @@ Sends a select request to the daemon.
 public function ping(): bool
 ```
 
-Checks if the daemon is responsive.
+Health check. Returns `true` if daemon responds.
+
+### status()
+
+```php
+public function status(): array
+```
+
+Returns daemon status information.
+
+## Auto-Start Daemon
+
+If socket doesn't exist, starts daemon automatically:
+
+```php
+private function startDaemon(): void
+{
+    $this->daemonManager = new DaemonManager($this->binaryPath);
+    $socketUrl = $this->daemonManager->start([
+        'indexDir' => $this->indexDir
+    ]);
+    $this->socketPath = $socketUrl;
+}
+```
+
+## Reconnection Logic
+
+Handles broken connections gracefully:
+
+```php
+private function reconnect(): void
+{
+    if ($this->socket !== null) {
+        @fclose($this->socket);
+        $this->socket = null;
+    }
+    
+    usleep(100000);  // 100ms wait
+    
+    if (!$this->socketFileExists($this->socketPath)) {
+        $this->startDaemon();  // Restart if daemon died
+    }
+    
+    $this->connect();
+}
+```
+
+## Timeouts
+
+| Timeout | Value | Purpose |
+|---------|-------|---------|
+| Connect | 5s | Initial connection |
+| Query | 30s | Request/response |
+| Idle | N/A | Connection persists |
+
+## Debug Mode
+
+```php
+$client = SocketClient::getInstance($binary, $indexDir);
+$client->debug = true;
+
+// [SocketClient] Request: {"action":"count","csv":"/data.csv","where":{}}
+// [SocketClient] Response: {"count":1500000,"error":null}
+```
+
+## Static Methods
+
+### isAvailable()
+
+```php
+public static function isAvailable(): bool
+```
+
+Check if daemon socket exists (without connecting).
+
+### reset()
+
+```php
+public static function reset(): void
+```
+
+Close connection and clear singleton (for testing).
+
+## Related Documentation
+
+- [GoBridge](./gobridge) - Uses SocketClient for socket-first queries
+- [Daemon (Go)](../go/daemon) - Server that handles socket requests
+- [DaemonManager](./daemon-manager) - Starts and manages daemon process

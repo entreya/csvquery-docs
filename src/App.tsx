@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './hooks/useTheme';
+import { MuiThemeWrapper } from './components/MuiThemeWrapper';
 import { Layout } from './components/layout/Layout';
 import { TabsProvider } from './components/layout/TabsContext';
 import { ScrollToTop } from './components/layout/ScrollToTop';
@@ -24,8 +25,9 @@ const CommunicationPage = lazy(() => import('./pages/CommunicationPage').then(mo
 const BenchmarksPage = lazy(() => import('./pages/BenchmarksPage').then(module => ({ default: module.BenchmarksPage })));
 const PerformancePage = lazy(() => import('./pages/PerformancePage').then(module => ({ default: module.PerformancePage })));
 const ComparisonsPage = lazy(() => import('./pages/ComparisonsPage').then(module => ({ default: module.ComparisonsPage })));
+const Experimental = lazy(() => import('./pages/Experimental'));
+const RoadmapPage = lazy(() => import('./pages/RoadmapPage'));
 
-// Loading fallback
 const PageLoader = () => (
   <div style={{
     display: 'flex',
@@ -42,42 +44,50 @@ const PageLoader = () => (
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter basename="/csvquery-docs">
-        <TabsProvider>
-          <ScrollToTop />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<HomePage />} />
+      <MuiThemeWrapper>
 
-                {/* Getting Started */}
-                <Route path="getting-started" element={<GettingStartedPage />} />
-                <Route path="getting-started/installation" element={<InstallationPage />} />
-                <Route path="getting-started/quick-start" element={<QuickStartPage />} />
-                <Route path="getting-started/examples" element={<ExamplesPage />} />
-                <Route path="getting-started/requirements" element={<RequirementsPage />} />
+        <BrowserRouter basename="/csvquery-docs">
+          <TabsProvider>
+            <ScrollToTop />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<HomePage />} />
 
-                {/* API Reference */}
-                <Route path="api" element={<ApiPage />} />
-                <Route path="api/conditions" element={<ConditionsPage />} />
-                {/* Dynamic API Docs - Matches /api/php/csvquery etc */}
-                <Route path="api/*" element={<ApiDocPage />} />
+                  {/* Getting Started */}
+                  <Route path="getting-started" element={<GettingStartedPage />} />
+                  <Route path="getting-started/installation" element={<InstallationPage />} />
+                  <Route path="getting-started/quick-start" element={<QuickStartPage />} />
+                  <Route path="getting-started/examples" element={<ExamplesPage />} />
+                  <Route path="getting-started/requirements" element={<RequirementsPage />} />
 
-                {/* Architecture */}
-                <Route path="architecture" element={<ArchitecturePage />} />
-                <Route path="architecture/php-layer" element={<PhpLayerPage />} />
-                <Route path="architecture/go-engine" element={<GoEnginePage />} />
-                <Route path="architecture/communication" element={<CommunicationPage />} />
+                  {/* API Reference */}
+                  <Route path="api" element={<ApiPage />} />
+                  <Route path="api/php/conditions" element={<ConditionsPage />} />
+                  {/* Dynamic API Docs - Matches /api/php/csvquery etc */}
+                  <Route path="api/*" element={<ApiDocPage section="api-reference" />} />
+                  <Route path="internals/*" element={<ApiDocPage section="internals" />} />
 
-                {/* Benchmarks */}
-                <Route path="benchmarks" element={<BenchmarksPage />} />
-                <Route path="benchmarks/performance" element={<PerformancePage />} />
-                <Route path="benchmarks/comparisons" element={<ComparisonsPage />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </TabsProvider>
-      </BrowserRouter>
+                  {/* Architecture */}
+                  <Route path="architecture" element={<ArchitecturePage />} />
+                  <Route path="architecture/php-layer" element={<PhpLayerPage />} />
+                  <Route path="architecture/go-engine" element={<GoEnginePage />} />
+                  <Route path="architecture/communication" element={<CommunicationPage />} />
+
+                  {/* Benchmarks */}
+                  <Route path="benchmarks" element={<BenchmarksPage />} />
+                  <Route path="benchmarks/performance" element={<PerformancePage />} />
+                  <Route path="benchmarks/comparisons" element={<ComparisonsPage />} />
+
+                  {/* Experimental */}
+                  <Route path="experimental" element={<Experimental />} />
+                  <Route path="roadmap" element={<RoadmapPage />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </TabsProvider>
+        </BrowserRouter>
+      </MuiThemeWrapper>
     </ThemeProvider>
   );
 }

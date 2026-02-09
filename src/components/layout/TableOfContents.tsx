@@ -18,7 +18,7 @@ export function TableOfContents() {
     useEffect(() => {
         // Short timeout to ensure DOM is updated after route transition
         const timer = setTimeout(() => {
-            const article = document.querySelector('article');
+            const article = document.getElementById('main-content') || document.querySelector('main') || document.querySelector('article');
             if (!article) return;
 
             const elements = article.querySelectorAll('h1, h2, h3');
