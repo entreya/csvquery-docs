@@ -17,33 +17,54 @@ export function TableOfContents() {
     // Parse headings from DOM
     useEffect(() => {
         const updateHeadings = () => {
-            // Select h2 and h3 from the main content area (assuming standard mdx output)
-            // We need to target the content area specifically to avoid picking up sidebar/nav headings
-            const elements = Array.from(document.querySelectorAll('main h2, main h3'));
+            // Select h2 and h3 from the main content area using the specific ID
+            const mainContent = document.getElementById('main-content');
+            if (!mainContent) return;
+
+            const elements = Array.from(mainContent.querySelectorAll('h2, h3'));
             const items: TocItem[] = elements.map((elem) => ({
                 id: elem.id,
                 text: elem.textContent || '',
                 level: Number(elem.tagName.substring(1)),
             }));
-            setHeadings(items);
+
+            // Only update if changed to avoid loops/jitters
+            setHeadings(prev => {
+                const isSame = prev.length === items.length &&
+                    prev.every((item, i) => item.id === items[i].id && item.text === items[i].text);
+                return isSame ? prev : items;
+            });
         };
 
-        // Run immediately and after a short delay to catch layout shifts/loading
-        updateHeadings();
-        const timeout = setTimeout(updateHeadings, 100);
-        const timeout2 = setTimeout(updateHeadings, 500); // Retry for lazy loaded content
+        // Retry logic to find main-content if it's not immediately available
+        const attemptUpdate = (retries = 5) => {
+            const mainContent = document.getElementById('main-content');
+            if (mainContent) {
+                updateHeadings();
+                // Attach observer once main content is found
+                const observer = new MutationObserver(updateHeadings);
+                observer.observe(mainContent, { childList: true, subtree: true });
+                return () => observer.disconnect();
+            } else if (retries > 0) {
+                const timer = setTimeout(() => attemptUpdate(retries - 1), 100);
+                return () => clearTimeout(timer);
+            }
+            return () => { };
+        };
 
-        // Observer for dynamic content changes
-        const observer = new MutationObserver(updateHeadings);
-        const main = document.querySelector('main');
-        if (main) {
-            observer.observe(main, { childList: true, subtree: true });
-        }
+        // Initial attempt
+        const cleanup = attemptUpdate();
+
+        // Also run a fallback timeout sequence just in case DOM structure settles late
+        const t1 = setTimeout(updateHeadings, 150);
+        const t2 = setTimeout(updateHeadings, 500);
+        const t3 = setTimeout(updateHeadings, 1000); // Late check for slower transitions
 
         return () => {
-            clearTimeout(timeout);
-            clearTimeout(timeout2);
-            observer.disconnect();
+            if (typeof cleanup === 'function') cleanup();
+            clearTimeout(t1);
+            clearTimeout(t2);
+            clearTimeout(t3);
         };
     }, [location.pathname]);
 
@@ -69,7 +90,10 @@ export function TableOfContents() {
     if (headings.length === 0) return null;
 
     return (
-        <nav className={styles.toc} aria-label="Table of contents">
+        <nav
+            className={styles.toc}
+            aria-label="Table of contents"
+        >
             <h4 className={styles.title}>On This Page</h4>
             <ul className={styles.list}>
                 {headings.map(heading => (

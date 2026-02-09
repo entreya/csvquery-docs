@@ -11,16 +11,16 @@ const DARK_THEME = {
     theme: 'base',
     themeVariables: {
         background: '#1E293B',
-        mainBkg: '#1E293B',
-        primaryColor: '#1E293B',
-        primaryBorderColor: '#8B5CF6',
-        nodeBorder: '#8B5CF6',
-        clusterBorder: '#8B5CF6',
-        primaryTextColor: '#FFFFFF',
-        titleColor: '#FFFFFF',
-        lineColor: '#94A3B8',
+        mainBkg: '#334155',      // Lighter background for nodes (Slate 700)
+        primaryColor: '#334155',
+        primaryBorderColor: '#94A3B8', // High contrast border (Slate 400)
+        nodeBorder: '#94A3B8',
+        clusterBorder: '#94A3B8',
+        primaryTextColor: '#F8FAFC',   // White text (Slate 50)
+        titleColor: '#F8FAFC',
+        lineColor: '#CBD5E1',          // Light lines (Slate 300)
         secondaryColor: '#0F172A',
-        tertiaryColor: '#334155',
+        tertiaryColor: '#475569',
         edgeLabelBackground: '#1E293B',
     },
 };
@@ -29,16 +29,16 @@ const LIGHT_THEME = {
     theme: 'base',
     themeVariables: {
         background: '#FFFFFF',
-        mainBkg: '#F1F5F9', // Slate 100
-        primaryColor: '#F1F5F9',
-        primaryBorderColor: '#7C3AED', // Purple 600
-        nodeBorder: '#7C3AED',
-        clusterBorder: '#7C3AED',
-        primaryTextColor: '#1E293B', // Slate 800
-        titleColor: '#1E293B',
-        lineColor: '#64748B',       // Slate 500
-        secondaryColor: '#FFFFFF',
-        tertiaryColor: '#E2E8F0',
+        mainBkg: '#FFFFFF',
+        primaryColor: '#FFFFFF',
+        primaryBorderColor: '#475569', // High contrast border (Slate 600)
+        nodeBorder: '#475569',
+        clusterBorder: '#475569',
+        primaryTextColor: '#0F172A',   // Dark text (Slate 900)
+        titleColor: '#0F172A',
+        lineColor: '#334155',          // Dark lines (Slate 700)
+        secondaryColor: '#F8FAFC',
+        tertiaryColor: '#F1F5F9',
         edgeLabelBackground: '#FFFFFF',
     },
 };

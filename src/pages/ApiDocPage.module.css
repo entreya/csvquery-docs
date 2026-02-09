@@ -33,6 +33,6 @@
 
 /* Ensure prism code blocks look good */
 .markdown pre {
-    margin: var(--space-6) 0;
+    margin: 0;
     box-shadow: none !important;
 }

@@ -3,6 +3,7 @@ title: Query Engine
 description: Internal Go engine for planning and executing queries against disk indexes.
 ---
 
+
 # Query Engine
 
 `github.com/entreya/csvquery/internal/query`
@@ -25,8 +26,7 @@ flowchart TB
     PostFilter -->|Pass| Output[Stream Result]
     PostFilter -->|Fail| Decompress
     
-    style Zero fill:#5a2727
-    style Output fill:#2d5a27
+
 ```
 
 ## QueryConfig

@@ -3,6 +3,7 @@ title: Bloom Filter
 description: Probabilistic data structure for fast negative lookups in indexes.
 ---
 
+
 # Bloom Filter
 
 `github.com/entreya/csvquery/internal/common`
@@ -150,12 +151,11 @@ The Query Engine uses bloom filters for **early exit**:
 ```mermaid
 flowchart TB
     Q[Query: column = 'value'] --> Load[Load .bloom file]
-    Load --> Check{bloom.MightContain('value')?}
+    Load --> Check{"bloom.MightContain('value')?"}
     Check -->|false| Zero[Return 0 results immediately]
     Check -->|true| Index[Proceed to index scan]
     
-    style Zero fill:#5a2727
-    style Index fill:#2d5a27
+
 ```
 
 ```go

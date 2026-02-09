@@ -3,6 +3,7 @@ title: SIMD Acceleration
 description: Hardware-accelerated delimiter detection using AVX2/AVX512 SIMD instructions.
 ---
 
+
 # SIMD Acceleration
 
 `github.com/entreya/csvquery/internal/simd`
@@ -21,9 +22,7 @@ flowchart TB
     D -->|Yes| E[scanImpl = ScanSeparatorsAVX2]
     D -->|No| F[scanImpl = scanSeparatorsGeneric]
     
-    style C fill:#2d5a27
-    style E fill:#3d6a37
-    style F fill:#5a5a27
+
 ```
 
 ```go
