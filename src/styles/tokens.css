@@ -81,129 +81,130 @@
     /* Code Block Background - Consistent Dark (Gary 900) */
     --bg-code: #111827;
 
-    /* Syntax Highlighting - Default Dark (Dracula-inspired) */
-    --token-comment: #6272a4;
-    --token-punctuation: #f8f8f2;
-    --token-property: #ff79c6;
-    --token-selector: #bd93f9;
-    --token-operator: #ff79c6;
-    --token-attr: #50fa7b;
-    --token-variable: #E5C07B;
-    --token-function: #50fa7b;
-    --token-keyword: #ff79c6;
-    --token-regex: #f1fa8c;
-    --token-number: #bd93f9;
-    --token-boolean: #bd93f9;
-    --token-string: #f1fa8c;
-    --token-class: #8be9fd;
+    /* Syntax Highlighting - Default Dark (GitHub Dark) */
+    --token-comment: #8b949e;
+    --token-punctuation: #c9d1d9;
+    --token-property: #79c0ff;
+    --token-selector: #d2a8ff;
+    --token-operator: #ff7b72;
+    --token-attr: #79c0ff;
+    --token-variable: #79c0ff;
+    --token-function: #d2a8ff;
+    --token-keyword: #ff7b72;
+    --token-regex: #a5d6ff;
+    --token-number: #79c0ff;
+    --token-boolean: #79c0ff;
+    --token-string: #a5d6ff;
+    --token-class: #f0883e;
 }
 
 /* Dark theme (default - Entreya brand) */
 [data-theme="dark"] {
-    --bg-primary: #0F172A;
+    --bg-primary: #0d1117;
+    /* GitHub Dark Dimmed */
     /* Slate 900 */
-    --bg-secondary: #1E293B;
+    --bg-secondary: #010409;
     /* Slate 800 */
-    --bg-tertiary: #334155;
+    --bg-tertiary: #161b22;
     /* Slate 700 */
     --bg-hover: rgba(139, 92, 246, 0.15);
 
     /* Text colors */
-    --text-primary: #F8FAFC;
+    --text-primary: #c9d1d9;
     /* Slate 50 */
-    --text-secondary: #E2E8F0;
+    --text-secondary: #8b949e;
     /* Slate 200 */
-    --text-tertiary: #CBD5E1;
+    --text-tertiary: #484f58;
     /* Slate 300 */
-    --text-muted: #94A3B8;
+    --text-muted: #30363d;
     /* Slate 400 */
 
-    --border-primary: #334155;
+    --border-primary: #30363d;
     /* Slate 700 */
-    --border-secondary: #1E293B;
+    --border-secondary: #21262d;
     --border-accent: rgba(139, 92, 246, 0.4);
 
     /* Links */
-    --link-color: #A78BFA;
-    --link-hover: #C4B5FD;
+    --link-color: #58a6ff;
+    --link-hover: #1f6feb;
 
     /* Inline Code */
-    --bg-inline-code: #1E293B;
+    --bg-inline-code: rgba(110, 118, 129, 0.4);
     /* Slate 800 */
-    --text-inline-code: #A78BFA;
+    --text-inline-code: #c9d1d9;
     /* Purple 400 */
-    --border-inline-code: #334155;
+    --border-inline-code: rgba(110, 118, 129, 0.4);
 
-    --scrollbar-track: #1E293B;
-    --scrollbar-thumb: #475569;
-    --scrollbar-thumb-hover: #64748B;
+    --scrollbar-track: #010409;
+    --scrollbar-thumb: #30363d;
+    --scrollbar-thumb-hover: #484f58;
 
     /* Semantic Callout Colors - High Contrast */
-    --color-note: #A78BFA;
-    --color-tip: #34D399;
-    --color-warning: #FBBF24;
-    --color-danger: #F87171;
-    --color-info: #38BDF8;
+    --color-note: #58a6ff;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-danger: #f85149;
+    --color-info: #58a6ff;
 }
 
 /* Light theme */
 [data-theme="light"] {
-    --bg-primary: #FFFFFF;
-    --bg-secondary: #F9FAFB;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f6f8fa;
     /* Gray 50 */
-    --bg-tertiary: #F3F4F6;
+    --bg-tertiary: #eaeef2;
     /* Gray 100 */
     --bg-hover: rgba(139, 92, 246, 0.1);
 
     /* Text colors */
-    --text-primary: #111827;
+    --text-primary: #24292f;
     /* Gray 900 */
-    --text-secondary: #374151;
+    --text-secondary: #57606a;
     /* Gray 700 */
-    --text-tertiary: #4B5563;
+    --text-tertiary: #6e7781;
     /* Gray 600 */
-    --text-muted: #6B7280;
+    --text-muted: #8c959f;
     /* Gray 500 */
 
-    --border-primary: #E5E7EB;
+    --border-primary: #d0d7de;
     /* Gray 200 */
-    --border-secondary: #F3F4F6;
+    --border-secondary: #eaeef2;
     --border-accent: rgba(139, 92, 246, 0.4);
 
     /* Links */
-    --link-color: #7C3AED;
-    --link-hover: #6D28D9;
+    --link-color: #0969da;
+    --link-hover: #1f2328;
 
     /* Inline Code */
-    --bg-inline-code: #F1F5F9;
+    --bg-inline-code: #eff1f3;
     /* Slate 100 */
-    --text-inline-code: #6D28D9;
+    --text-inline-code: #24292f;
     /* Purple 700 */
-    --border-inline-code: #E2E8F0;
+    --border-inline-code: #d0d7de;
 
-    --scrollbar-track: #F3F4F6;
-    --scrollbar-thumb: #D1D5DB;
-    --scrollbar-thumb-hover: #9CA3AF;
+    --scrollbar-track: #f6f8fa;
+    --scrollbar-thumb: #d0d7de;
+    --scrollbar-thumb-hover: #8c959f;
 
     /* Semantic Callout Colors - Darker for Light Mode */
-    --color-note: #7C3AED;
-    --color-tip: #059669;
-    --color-warning: #D97706;
-    --color-danger: #DC2626;
-    --color-info: #0284C7;
+    --color-note: #0969da;
+    --color-tip: #2da44e;
+    --color-warning: #dbab09;
+    --color-danger: #cf222e;
+    --color-info: #0969da;
 
     /* Light Mode Code Overrides for Readability */
-    --bg-code: #F3F4F6;
-    --text-code: #111827;
+    --bg-code: #f6f8fa;
+    --text-code: #24292f;
 
-    /* Syntax Highlighting - Light Mode (GitHub/VSCode Light inspired) */
-    --token-comment: #6a737d;
-    --token-punctuation: #24292e;
+    /* Syntax Highlighting - Light Mode (GitHub Light) */
+    --token-comment: #6e7781;
+    --token-punctuation: #24292f;
     --token-property: #005cc5;
     --token-selector: #22863a;
     --token-operator: #d73a49;
     --token-attr: #6f42c1;
-    --token-variable: #e36209;
+    --token-variable: #005cc5;
     --token-function: #6f42c1;
     --token-keyword: #d73a49;
     --token-regex: #032f62;

@@ -10,6 +10,8 @@ import { Breadcrumbs } from './Breadcrumbs';
 import { SearchModal } from '../search/SearchModal';
 import styles from './Layout.module.css';
 
+import { ProgressBar } from '../ui/ProgressBar';
+
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -41,6 +43,7 @@ export function Layout() {
 
     return (
         <div className={styles.layout}>
+            <ProgressBar />
             <a href="#main-content" className="skip-link">
                 Skip to main content
             </a>
