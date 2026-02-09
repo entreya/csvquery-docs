@@ -78,8 +78,10 @@
     --focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.5);
     --focus-ring-offset: 0 0 0 2px var(--bg-primary);
 
-    /* Code Block Background - Consistent Dark (Gary 900) */
-    --bg-code: #111827;
+    /* Code Block - GitHub Dark */
+    --bg-code: #161b22;
+    /* Standard GitHub Dark Canvas */
+    --border-code: #30363d;
 
     /* Syntax Highlighting - Default Dark (GitHub Dark) */
     --token-comment: #8b949e;
@@ -88,7 +90,8 @@
     --token-selector: #d2a8ff;
     --token-operator: #ff7b72;
     --token-attr: #79c0ff;
-    --token-variable: #79c0ff;
+    --token-variable: #ffa657;
+    /* Orange/Peach for variables */
     --token-function: #d2a8ff;
     --token-keyword: #ff7b72;
     --token-regex: #a5d6ff;
