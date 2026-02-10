@@ -14,7 +14,7 @@ export function PageLoader() {
         const timeoutMsg = setTimeout(() => {
             console.warn('Page load timeout. Reloading...');
             window.location.reload();
-        }, 15000);
+        }, 3000);
 
         // Cleanup: finish progress bar when component unmounts (loading finishes)
         return () => {
