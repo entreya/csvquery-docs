@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { Box, Container, useTheme, useMediaQuery } from '@mui/material';
 import { Header } from './Header';
@@ -10,6 +10,7 @@ import { TabsBar } from './TabsBar';
 import { Breadcrumbs } from './Breadcrumbs';
 import { SearchModal } from '../search/SearchModal';
 import { ProgressBar } from '../ui/ProgressBar';
+import { PageLoader } from './PageLoader';
 
 export function Layout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -130,7 +131,9 @@ export function Layout() {
                                 }}
                             >
                                 <Breadcrumbs />
-                                <Outlet />
+                                <Suspense fallback={<PageLoader />}>
+                                    <Outlet />
+                                </Suspense>
                                 <DocsPager />
                             </Container>
                         </Box>

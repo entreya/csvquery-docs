@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './hooks/useTheme';
 import { MuiThemeWrapper } from './components/MuiThemeWrapper';
@@ -28,7 +28,7 @@ const ComparisonsPage = lazy(() => import('./pages/ComparisonsPage').then(module
 const Experimental = lazy(() => import('./pages/Experimental'));
 const RoadmapPage = lazy(() => import('./pages/RoadmapPage'));
 
-import { PageLoader } from './components/layout/PageLoader';
+
 
 function App() {
   return (
@@ -38,42 +38,40 @@ function App() {
         <BrowserRouter basename="/csvquery-docs">
           <TabsProvider>
             <ScrollToTop />
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<HomePage />} />
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<HomePage />} />
 
-                  {/* Getting Started */}
-                  <Route path="getting-started" element={<GettingStartedPage />} />
-                  <Route path="getting-started/installation" element={<InstallationPage />} />
-                  <Route path="getting-started/quick-start" element={<QuickStartPage />} />
-                  <Route path="getting-started/examples" element={<ExamplesPage />} />
-                  <Route path="getting-started/requirements" element={<RequirementsPage />} />
+                {/* Getting Started */}
+                <Route path="getting-started" element={<GettingStartedPage />} />
+                <Route path="getting-started/installation" element={<InstallationPage />} />
+                <Route path="getting-started/quick-start" element={<QuickStartPage />} />
+                <Route path="getting-started/examples" element={<ExamplesPage />} />
+                <Route path="getting-started/requirements" element={<RequirementsPage />} />
 
-                  {/* API Reference */}
-                  <Route path="api" element={<ApiPage />} />
-                  <Route path="api/php/conditions" element={<ConditionsPage />} />
-                  {/* Dynamic API Docs - Matches /api/php/csvquery etc */}
-                  <Route path="api/*" element={<ApiDocPage section="api-reference" />} />
-                  <Route path="internals/*" element={<ApiDocPage section="internals" />} />
+                {/* API Reference */}
+                <Route path="api" element={<ApiPage />} />
+                <Route path="api/php/conditions" element={<ConditionsPage />} />
+                {/* Dynamic API Docs - Matches /api/php/csvquery etc */}
+                <Route path="api/*" element={<ApiDocPage section="api-reference" />} />
+                <Route path="internals/*" element={<ApiDocPage section="internals" />} />
 
-                  {/* Architecture */}
-                  <Route path="architecture" element={<ArchitecturePage />} />
-                  <Route path="architecture/php-layer" element={<PhpLayerPage />} />
-                  <Route path="architecture/go-engine" element={<GoEnginePage />} />
-                  <Route path="architecture/communication" element={<CommunicationPage />} />
+                {/* Architecture */}
+                <Route path="architecture" element={<ArchitecturePage />} />
+                <Route path="architecture/php-layer" element={<PhpLayerPage />} />
+                <Route path="architecture/go-engine" element={<GoEnginePage />} />
+                <Route path="architecture/communication" element={<CommunicationPage />} />
 
-                  {/* Benchmarks */}
-                  <Route path="benchmarks" element={<BenchmarksPage />} />
-                  <Route path="benchmarks/performance" element={<PerformancePage />} />
-                  <Route path="benchmarks/comparisons" element={<ComparisonsPage />} />
+                {/* Benchmarks */}
+                <Route path="benchmarks" element={<BenchmarksPage />} />
+                <Route path="benchmarks/performance" element={<PerformancePage />} />
+                <Route path="benchmarks/comparisons" element={<ComparisonsPage />} />
 
-                  {/* Experimental */}
-                  <Route path="experimental" element={<Experimental />} />
-                  <Route path="roadmap" element={<RoadmapPage />} />
-                </Route>
-              </Routes>
-            </Suspense>
+                {/* Experimental */}
+                <Route path="experimental" element={<Experimental />} />
+                <Route path="roadmap" element={<RoadmapPage />} />
+              </Route>
+            </Routes>
           </TabsProvider>
         </BrowserRouter>
       </MuiThemeWrapper>
