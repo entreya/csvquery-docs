@@ -22,11 +22,13 @@ export function TableOfContents() {
             if (!mainContent) return;
 
             const elements = Array.from(mainContent.querySelectorAll('h2, h3'));
-            const items: TocItem[] = elements.map((elem) => ({
-                id: elem.id,
-                text: elem.textContent || '',
-                level: Number(elem.tagName.substring(1)),
-            }));
+            const items: TocItem[] = elements
+                .map((elem) => ({
+                    id: elem.id,
+                    text: elem.textContent || '',
+                    level: Number(elem.tagName.substring(1)),
+                }))
+                .filter(item => item.id && item.text); // Ensure ID exists
 
             // Only update if changed to avoid loops/jitters
             setHeadings(prev => {
@@ -68,22 +70,43 @@ export function TableOfContents() {
         };
     }, [location.pathname]);
 
-    // Scroll spy
+    // Scroll spy using IntersectionObserver or getBoundingClientRect
+    // Using getBoundingClientRect for simpler active state logic relative to header height
     useEffect(() => {
         const handleScroll = () => {
-            const headingElements = headings.map(h => document.getElementById(h.id));
-            const scrollPosition = window.scrollY + 100; // offset
+            const headerOffset = 100; // Account for sticky header
+            const headingElements = headings.map(h => document.getElementById(h.id)).filter(Boolean) as HTMLElement[];
 
+            // Find the last heading that is above the "scrolled past" line
             let currentId = '';
             for (const elem of headingElements) {
-                if (elem && elem.offsetTop <= scrollPosition) {
+                const rect = elem.getBoundingClientRect();
+                // If top of element is above (or close to) the fixed header area
+                if (rect.top <= headerOffset + 50) {
                     currentId = elem.id;
+                } else {
+                    // Since we're iterating in order, once we find one below, we can stop? 
+                    // No, because we want the *last* one that satisfied the condition.
+                    // But if we found one below, the *previous* one was the correct one.
+                    break;
                 }
             }
+
+            // If we are at the very bottom of the page, highlight the last item
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
+                if (headingElements.length > 0) {
+                    currentId = headingElements[headingElements.length - 1].id;
+                }
+            }
+
             setActiveId(currentId);
         };
 
-        window.addEventListener('scroll', handleScroll);
+        // Throttle slightly or just use passive listener
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        // Trigger once on mount to set initial active
+        handleScroll();
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, [headings]);
 
