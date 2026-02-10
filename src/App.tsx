@@ -28,18 +28,7 @@ const ComparisonsPage = lazy(() => import('./pages/ComparisonsPage').then(module
 const Experimental = lazy(() => import('./pages/Experimental'));
 const RoadmapPage = lazy(() => import('./pages/RoadmapPage'));
 
-const PageLoader = () => (
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-    minHeight: '200px',
-    color: 'var(--text-tertiary)'
-  }}>
-    Loading...
-  </div>
-);
+import { PageLoader } from './components/layout/PageLoader';
 
 function App() {
   return (
