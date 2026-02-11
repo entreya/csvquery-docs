@@ -27,9 +27,7 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
             <Toolbar
                 disableGutters
                 sx={{
-                    maxWidth: 1400,
                     width: '100%',
-                    mx: 'auto',
                     px: 3, // space-6 (1.5rem)
                     display: 'flex',
                     alignItems: 'center',
@@ -42,7 +40,7 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                     }
                 }}
             >
-                {/* Left Section */}
+                {/* Left Section (Branding) */}
                 <Box
                     sx={{
                         display: 'flex',
@@ -126,18 +124,19 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                     </Link>
                 </Box>
 
-                {/* Right Section */}
+                {/* Center Section (Search Bar) */}
                 <Box
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 2, // space-4
+                        justifyContent: 'center',
                         width: '100%',
-                        maxWidth: 800,
-                        justifyContent: { xs: 'flex-end', md: 'center' },
+                        maxWidth: 600,
                         [muiTheme.breakpoints.down('md')]: {
                             width: 'auto',
                             flex: 1,
+                            justifyContent: 'flex-end',
+                            mr: 2,
                         }
                     }}
                 >
@@ -218,7 +217,18 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                             ⌘K
                         </Box>
                     </ButtonBase>
+                </Box>
 
+                {/* Right Section (Actions) */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: { xs: 1, md: 2 },
+                        position: { md: 'absolute' },
+                        right: { md: 24 },
+                    }}
+                >
                     <IconButton
                         href="https://github.com/entreya/csvquery"
                         target="_blank"
