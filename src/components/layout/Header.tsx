@@ -84,24 +84,34 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                             gap: { xs: 0, sm: 1.5 },
                             color: 'text.primary',
                             textDecoration: 'none !important',
-                            pr: 2.5,
-                            mr: 2.5,
-                            borderRight: 1,
-                            borderColor: 'divider',
-                            flexShrink: 0,
-                            height: 32, // Match logo height
+                            mr: 3,
+                            flexShrink: 0
                         }}
                     >
                         <Box
-                            component="img"
-                            src="/csvquery-docs/entreya-logo-final.png"
-                            alt="entreya"
                             sx={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: 0.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                p: 0.5,
+                                border: 1,
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                bgcolor: 'background.paper',
+                                width: 36,
+                                height: 36,
                             }}
-                        />
+                        >
+                            <Box
+                                component="img"
+                                src="/csvquery-docs/entreya-logo-final.png"
+                                alt="entreya"
+                                sx={{
+                                    width: 28,
+                                    height: 28,
+                                }}
+                            />
+                        </Box>
                         <Typography
                             sx={{
                                 fontSize: '1.25rem',
