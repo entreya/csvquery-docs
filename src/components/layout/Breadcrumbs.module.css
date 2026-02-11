@@ -138,6 +138,20 @@
     display: none;
 }
 
+/* Correction for single item (both first and last) */
+.item:first-child:last-child {
+    margin-left: 0;
+    clip-path: none !important;
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--primary-500) !important;
+    padding: 0 var(--space-4);
+}
+
+.item:first-child:last-child::before,
+.item:first-child:last-child::after {
+    display: none !important;
+}
+
 .item:hover {
     background-color: var(--bg-hover);
     color: var(--text-primary);
