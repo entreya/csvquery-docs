@@ -84,8 +84,12 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                             gap: { xs: 0, sm: 1.5 },
                             color: 'text.primary',
                             textDecoration: 'none !important',
-                            mr: 2,
-                            flexShrink: 0
+                            pr: 2.5,
+                            mr: 2.5,
+                            borderRight: 1,
+                            borderColor: 'divider',
+                            flexShrink: 0,
+                            height: 32, // Match logo height
                         }}
                     >
                         <Box
