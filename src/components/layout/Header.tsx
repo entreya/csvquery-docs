@@ -81,18 +81,16 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 1.5,
+                            gap: { xs: 0, sm: 1.5 },
                             color: 'text.primary',
                             textDecoration: 'none !important',
                             mr: 2,
-                            [muiTheme.breakpoints.down('md')]: {
-                                display: 'none'
-                            }
+                            flexShrink: 0
                         }}
                     >
                         <Box
                             component="img"
-                            src="/csvquery-docs/entreya-logo.png"
+                            src="/csvquery-docs/entreya-logo-transparent.png"
                             alt="entreya"
                             sx={{
                                 width: 32,
@@ -100,7 +98,15 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                                 borderRadius: 0.5,
                             }}
                         />
-                        <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em' }}>
+                        <Typography
+                            sx={{
+                                fontSize: '1.25rem',
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                letterSpacing: '-0.02em',
+                                display: { xs: 'none', lg: 'block' }
+                            }}
+                        >
                             csvquery
                         </Typography>
                     </Link>
