@@ -66,7 +66,11 @@ const findTabChain = (path: string): BreadcrumbItem[] => {
 
     for (const section of navigation) {
         const found = search(section.items, []);
-        if (found) return found;
+        if (found) {
+            // Prepend the section title as a breadcrumb
+            // It's a structural container, so no path (not clickable)
+            return [{ title: section.title, path: '', icon: undefined }, ...found];
+        }
     }
 
     // Fallback logic for paths not in navigation
@@ -102,26 +106,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
                 return updated;
             }
 
-            // Check for sibling navigation (same parent)
-            // A sibling shares the same parent breadcrumb chain (all but last item)
-            const parentChain = chain.slice(0, -1);
-
-            if (parentChain.length > 0) {
-                const siblingIndex = prev.findIndex(t => {
-                    const tabParentChain = t.breadcrumbs.slice(0, -1);
-                    if (tabParentChain.length !== parentChain.length) return false;
-                    return tabParentChain.every((item, i) => item.title === parentChain[i].title);
-                });
-
-                if (siblingIndex !== -1) {
-                    // Replace sibling tab with new path
-                    const updated = [...prev];
-                    updated[siblingIndex] = { path: location.pathname, breadcrumbs: chain };
-                    return updated;
-                }
-            }
-
-            // No existing or sibling tab - add new tab
+            // No existing tab - add new tab
             return [...prev, { path: location.pathname, breadcrumbs: chain }];
         });
     }, [location.pathname]);

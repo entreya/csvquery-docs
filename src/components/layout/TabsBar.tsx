@@ -70,56 +70,37 @@ export function TabsBar() {
                 {tabs.map((tab, tabIndex) => {
                     const isActiveTab = tab.path === activeTabPath;
                     const breadcrumbs = tab.breadcrumbs;
+                    if (!breadcrumbs || breadcrumbs.length === 0) return null;
 
-                    // For each tab, render its breadcrumb chain as connected segments
-                    // The LAST breadcrumb is the actual page (leaf)
+                    // Only render the LEAF node (last item) as the tab
+                    const lastCrumb = breadcrumbs[breadcrumbs.length - 1];
+                    const Icon = lastCrumb.icon || DescriptionTwoToneIcon;
+
                     return (
                         <div key={tab.path} className={clsx(styles.tabGroup, { [styles.activeGroup]: isActiveTab })}>
-                            {breadcrumbs.map((crumb, crumbIndex) => {
-                                const isLast = crumbIndex === breadcrumbs.length - 1;
-                                const Icon = crumb.icon || DescriptionTwoToneIcon;
+                            <button
+                                ref={(el) => { tabRefs.current[tab.path] = el; }}
+                                className={clsx(styles.tab, {
+                                    [styles.active]: isActiveTab
+                                })}
+                                onClick={() => openTab(tab.path)}
+                                title={lastCrumb.title}
+                            >
+                                <Icon sx={{ fontSize: 16, mr: 0.5, opacity: 0.8 }} />
+                                <span className={styles.title}>{lastCrumb.title}</span>
+                                <span
+                                    className={styles.closeBtn}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        closeTab(tab.path);
+                                    }}
+                                    title="Close tab"
+                                >
+                                    <CloseTwoToneIcon sx={{ fontSize: 14 }} />
+                                </span>
+                            </button>
 
-                                // Parent crumbs (non-last) are displayed as non-clickable divs
-                                if (!isLast) {
-                                    return (
-                                        <div
-                                            key={crumb.path + crumbIndex}
-                                            className={clsx(styles.tab, styles.crumb)}
-                                            title={crumb.title}
-                                        >
-                                            <Icon sx={{ fontSize: 16, mr: 0.5, opacity: 0.8 }} />
-                                            <span className={styles.title}>{crumb.title}</span>
-                                        </div>
-                                    );
-                                }
-
-                                // Leaf tab (last item) - clickable button
-                                return (
-                                    <button
-                                        key={crumb.path + crumbIndex}
-                                        ref={(el) => { tabRefs.current[tab.path] = el; }}
-                                        className={clsx(styles.tab, {
-                                            [styles.active]: isActiveTab
-                                        })}
-                                        onClick={() => openTab(crumb.path)}
-                                        title={crumb.title}
-                                    >
-                                        <Icon sx={{ fontSize: 16, mr: 0.5, opacity: 0.8 }} />
-                                        <span className={styles.title}>{crumb.title}</span>
-                                        <span
-                                            className={styles.closeBtn}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                closeTab(tab.path);
-                                            }}
-                                            title="Close tab"
-                                        >
-                                            <CloseTwoToneIcon sx={{ fontSize: 14 }} />
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                            {/* Separator between tab groups */}
+                            {/* Separator between tabs */}
                             {tabIndex < tabs.length - 1 && <div className={styles.separator} />}
                         </div>
                     );
