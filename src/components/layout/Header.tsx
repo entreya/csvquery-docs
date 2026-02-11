@@ -90,7 +90,7 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                     >
                         <Box
                             component="img"
-                            src="/csvquery-docs/entreya-logo-transparent.png"
+                            src="/csvquery-docs/entreya-logo-final.png"
                             alt="entreya"
                             sx={{
                                 width: 32,
