@@ -1,4 +1,5 @@
-import { AppBar, Toolbar, Box, IconButton, useTheme as useMuiTheme, ButtonBase, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { AppBar, Toolbar, Box, IconButton, useTheme as useMuiTheme, ButtonBase, Typography, Link } from '@mui/material';
 import { useTheme } from '../../hooks/useTheme';
 
 interface HeaderProps {
@@ -72,7 +73,37 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
                             <line x1="3" y1="18" x2="21" y2="18" />
                         </svg>
                     </IconButton>
-                    {/* Branding Removed from Header as requested */}
+                    {/* Branding */}
+                    <Link
+                        component={RouterLink}
+                        to="/"
+                        underline="none"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            color: 'text.primary',
+                            textDecoration: 'none !important',
+                            mr: 2,
+                            [muiTheme.breakpoints.down('md')]: {
+                                display: 'none'
+                            }
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src="/csvquery-docs/entreya-logo.png"
+                            alt="entreya"
+                            sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: 0.5,
+                            }}
+                        />
+                        <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, color: 'text.primary', letterSpacing: '-0.02em' }}>
+                            csvquery
+                        </Typography>
+                    </Link>
                 </Box>
 
                 {/* Right Section */}

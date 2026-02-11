@@ -255,46 +255,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     }
                 }}
             >
-                {/* Branding Header */}
-                <Box
-                    sx={{
-                        p: '0.5rem', // Reduced logo padding
-                        mb: 1,
-                        borderBottom: 1,
-                        borderColor: 'divider',
-                    }}
-                >
-                    <Link
-                        component={RouterLink}
-                        to="/"
-                        underline="none"
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1.5,
-                            color: 'text.primary',
-                            textDecoration: 'none !important',
-                        }}
-                    >
-                        <Box
-                            component="img"
-                            src="/csvquery-docs/entreya-logo.png"
-                            alt="entreya"
-                            sx={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: 0.5,
-                            }}
-                        />
-                        <Box sx={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-                            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: 'text.primary' }}>
-                                csvquery
-                            </Typography>
-                        </Box>
-                    </Link>
-                </Box>
-
-                <Box component="nav" sx={{ display: 'flex', flexDirection: 'column', flex: 1, pb: 8 }}>
+                <Box component="nav" sx={{ display: 'flex', flexDirection: 'column', flex: 1, pb: 8, pt: 2 }}>
                     {navigation.map((section) => {
                         const isSectionOpen = openSections.includes(section.title);
 
