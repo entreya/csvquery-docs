@@ -7,7 +7,7 @@ export function Footer() {
                 <div className={styles.left}>
                     <span className={styles.logo}>
                         <img
-                            src="/csvquery-docs/entreya-logo.png"
+                            src="/csvquery-docs/entreya-logo-final.png"
                             alt="entreya"
                             className={styles.logoIcon}
                         />
