@@ -2,7 +2,9 @@
     width: 100%;
     border-bottom: 1px solid var(--border-primary);
     background-color: var(--bg-primary);
-    position: relative;
+    position: sticky;
+    top: 0;
+    z-index: 40;
     display: flex;
     align-items: stretch;
     height: 40px;
