@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { navigation } from '../../lib/navigation';
 import styles from './SearchModal.module.css';
 import ArticleIcon from '@mui/icons-material/Article';
-import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
+import HistoryIcon from '@mui/icons-material/History';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import type { SvgIconComponent } from '@mui/icons-material';
 
 interface SearchModalProps {
@@ -18,12 +19,55 @@ interface SearchResult {
     icon?: SvgIconComponent;
 }
 
+const HISTORY_KEY = 'csvquery_search_history';
+const MAX_HISTORY = 5;
+
 export function SearchModal({ onClose }: SearchModalProps) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<SearchResult[]>([]);
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [history, setHistory] = useState<SearchResult[]>([]);
     const inputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedHistory = localStorage.getItem(HISTORY_KEY);
+        if (savedHistory) {
+            try {
+                const parsed = JSON.parse(savedHistory);
+                // Sanitize history to ensure no invalid icon components cause crashes
+                const sanitized = Array.isArray(parsed) ? parsed.map((item: any) => ({
+                    ...item,
+                    icon: undefined // Ensure icon is undefined
+                })) : [];
+                setHistory(sanitized);
+            } catch (e) {
+                console.error('Failed to parse search history', e);
+                // If parsing fails, clear the corrupted history
+                localStorage.removeItem(HISTORY_KEY);
+            }
+        }
+    }, []);
+
+    const addToHistory = (item: SearchResult) => {
+        // Create a history item without the icon component (it can't be serialized)
+        const historyItem = { ...item, icon: undefined };
+        const newHistory = [historyItem, ...history.filter(h => h.href !== item.href)].slice(0, MAX_HISTORY);
+        setHistory(newHistory);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    };
+
+    const clearHistory = () => {
+        setHistory([]);
+        localStorage.removeItem(HISTORY_KEY);
+    };
+
+    const removeFromHistory = (e: React.MouseEvent, href: string) => {
+        e.stopPropagation();
+        const newHistory = history.filter(h => h.href !== href);
+        setHistory(newHistory);
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    }
 
     // Build searchable items from navigation
     const searchItems: SearchResult[] = useMemo(() => {
@@ -85,28 +129,33 @@ export function SearchModal({ onClose }: SearchModalProps) {
     // Handle keyboard navigation
     const handleKeyDown = useCallback(
         (e: KeyboardEvent) => {
+            const currentList = results.length > 0 ? results : history;
+
             switch (e.key) {
                 case 'Escape':
                     onClose();
                     break;
                 case 'ArrowDown':
                     e.preventDefault();
-                    setSelectedIndex(prev => Math.min(prev + 1, results.length - 1));
+                    if (currentList.length > 0) {
+                        setSelectedIndex(prev => Math.min(prev + 1, currentList.length - 1));
+                    }
                     break;
                 case 'ArrowUp':
                     e.preventDefault();
-                    setSelectedIndex(prev => Math.max(prev - 1, 0));
+                    if (currentList.length > 0) {
+                        setSelectedIndex(prev => Math.max(prev - 1, 0));
+                    }
                     break;
                 case 'Enter':
                     e.preventDefault();
-                    if (results[selectedIndex]) {
-                        navigate(results[selectedIndex].href);
-                        onClose();
+                    if (currentList[selectedIndex]) {
+                        handleResultClick(currentList[selectedIndex]);
                     }
                     break;
             }
         },
-        [results, selectedIndex, navigate, onClose]
+        [results, history, selectedIndex, onClose]
     );
 
     useEffect(() => {
@@ -118,9 +167,25 @@ export function SearchModal({ onClose }: SearchModalProps) {
         inputRef.current?.focus();
     }, []);
 
-    const handleResultClick = (href: string) => {
-        navigate(href);
+    const handleResultClick = (item: SearchResult) => {
+        addToHistory(item);
+        navigate(item.href);
         onClose();
+    };
+
+    const renderBreadcrumbs = (path: { title: string }[]) => {
+        if (path.length === 0) return null;
+
+        return (
+            <div className={styles.breadcrumbs}>
+                {path.map((p, i) => (
+                    <span key={i} className={styles.breadcrumbSegment}>
+                        {i > 0 && <span className={styles.breadcrumbSeparator}>&gt;</span>}
+                        {p.title}
+                    </span>
+                ))}
+            </div>
+        );
     };
 
     const renderResults = () => {
@@ -132,47 +197,27 @@ export function SearchModal({ onClose }: SearchModalProps) {
                     {items.map(result => {
                         const currentIndex = globalIndex++;
                         const isSelected = currentIndex === selectedIndex;
-
-                        // Build tree items: path segments + final result
-                        const treeItems = [
-                            ...result.path.slice(1), // Skip section (already shown as header)
-                            { title: result.title, href: result.href, icon: result.icon }
-                        ];
+                        const ItemIcon = result.icon || ArticleIcon;
 
                         return (
                             <li key={result.href}>
                                 <div
                                     className={`${styles.result} ${isSelected ? styles.selected : ''}`}
                                     onMouseEnter={() => setSelectedIndex(currentIndex)}
+                                    onClick={() => handleResultClick(result)}
                                 >
-                                    <div className={styles.treeView}>
-                                        {treeItems.map((item, depth) => {
-                                            const isLast = depth === treeItems.length - 1;
-                                            const ItemIcon = (item as any).icon || ArticleIcon;
-
-                                            return (
-                                                <div
-                                                    key={depth}
-                                                    className={styles.treeLine}
-                                                    style={{ paddingLeft: depth * 16 }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (item.href) {
-                                                            handleResultClick(item.href);
-                                                        }
-                                                    }}
-                                                >
-                                                    <span className={styles.treeConnector}>
-                                                        {depth > 0 ? (isLast ? '└─' : '├─') : ''}
-                                                    </span>
-                                                    {depth === 0 && !isLast && <AccountTreeTwoToneIcon sx={{ fontSize: 14, mr: 0.5, opacity: 0.6 }} />}
-                                                    {isLast && <ItemIcon sx={{ fontSize: 16, mr: 0.75, color: 'primary.main' }} />}
-                                                    <span className={`${styles.treeLabel} ${isLast ? styles.treeLabelMain : ''} ${item.href ? styles.treeClickable : ''}`}>
-                                                        {item.title}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })}
+                                    <div className={styles.resultIcon}>
+                                        <ItemIcon />
+                                    </div>
+                                    <div className={styles.resultContent}>
+                                        {renderBreadcrumbs(result.path)}
+                                        <div className={styles.resultTitle}>{result.title}</div>
+                                    </div>
+                                    <div className={styles.enterIcon}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="9 10 4 15 9 20" />
+                                            <path d="M20 4v7a4 4 0 0 1-4 4H4" />
+                                        </svg>
                                     </div>
                                 </div>
                             </li>
@@ -182,6 +227,50 @@ export function SearchModal({ onClose }: SearchModalProps) {
             </div>
         ));
     };
+
+    const renderHistory = () => {
+        if (history.length === 0 || query !== '') return null;
+
+        return (
+            <div className={styles.sectionGroup}>
+                <div className={styles.sectionHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Recent Searches</span>
+                    <button className={styles.clearHistoryButton} onClick={clearHistory}>Clear All</button>
+                </div>
+                <ul className={styles.resultsList}>
+                    {history.map((result, index) => {
+                        const isSelected = index === selectedIndex;
+                        const ItemIcon = result.icon || HistoryIcon;
+
+                        return (
+                            <li key={result.href}>
+                                <div
+                                    className={`${styles.result} ${isSelected ? styles.selected : ''}`}
+                                    onMouseEnter={() => setSelectedIndex(index)}
+                                    onClick={() => handleResultClick(result)}
+                                >
+                                    <div className={styles.resultIcon}>
+                                        <ItemIcon sx={{ color: 'text.secondary', opacity: 0.7 }} />
+                                    </div>
+                                    <div className={styles.resultContent}>
+                                        {renderBreadcrumbs(result.path)}
+                                        <div className={styles.resultTitle}>{result.title}</div>
+                                    </div>
+                                    <div
+                                        className={styles.deleteHistoryIcon}
+                                        onClick={(e) => removeFromHistory(e, result.href)}
+                                        title="Remove from history"
+                                    >
+                                        <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </div>
+        );
+    }
 
 
     return (
@@ -211,17 +300,21 @@ export function SearchModal({ onClose }: SearchModalProps) {
                     <kbd className={styles.kbd}>ESC</kbd>
                 </div>
 
-                {results.length > 0 && (
-                    <div className={styles.results}>
-                        {renderResults()}
-                    </div>
-                )}
+                <div className={styles.resultsContainer}>
+                    {renderHistory()}
+
+                    {results.length > 0 && (
+                        <div className={styles.results}>
+                            {renderResults()}
+                        </div>
+                    )}
+                </div>
 
                 {query && results.length === 0 && (
                     <div className={styles.noResults}>No results found for "{query}"</div>
                 )}
 
-                {!query && (
+                {!query && history.length === 0 && (
                     <div className={styles.hints}>
                         <p>Start typing to search...</p>
                     </div>

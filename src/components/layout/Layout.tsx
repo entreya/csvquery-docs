@@ -104,6 +104,7 @@ export function Layout() {
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
+                    onSearchOpen={handleSearchOpen}
                 />
 
                 {/* Content Column: TabsBar + (Main + TOC) */}

@@ -16,6 +16,7 @@ export function Header({ onMenuToggle, onSearchOpen }: HeaderProps) {
             position="sticky"
             elevation={0}
             sx={{
+                display: { xs: 'flex', lg: 'none' },
                 height: 64, // var(--header-height)
                 bgcolor: 'background.default',
                 borderBottom: 1,
